@@ -3,7 +3,7 @@
 ECHO Creating virtual environment
 
 REM Have a look here for details about the below command: https://docs.python.org/3/library/venv.html
-py -3.7 -m venv venv
+py -3.5 -m venv venv
 
 ECHO Activating virtual environment
 
