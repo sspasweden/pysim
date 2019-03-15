@@ -2,6 +2,7 @@
 #include <vector>
 #include <map>
 #include <memory>
+#include <Eigen/Dense>
 
 
 namespace pysim {
@@ -20,6 +21,7 @@ public:
     double getScalar(char* name);
     std::vector<double> getVector(char* name);
     std::vector<std::vector<double>> getMatrix(char* name);
+
     std::map<std::string, std::string> getDescriptionMap();
     
     std::unique_ptr<VariablePrivate> d_ptr;

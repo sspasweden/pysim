@@ -77,13 +77,13 @@
     <ProjectGuid>{16F0A7F7-8AE6-4F5A-BC67-2B63CE324FD3}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>defaultsystemcollection1</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
@@ -95,7 +95,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -118,6 +118,8 @@
     <Import Project="..\props\cppsystemlib.props" />
     <Import Project="..\props\numpy37-32.props" />
     <Import Project="..\props\python37-32.props" />
+    <Import Project="..\props\numpy35-32.props" />
+    <Import Project="..\props\python35-32.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -128,6 +130,8 @@
     <Import Project="..\props\numpy36.props" />
     <Import Project="..\props\numpy37-32.props" />
     <Import Project="..\props\python37-32.props" />
+    <Import Project="..\props\numpy35-32.props" />
+    <Import Project="..\props\python35-32.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -138,6 +142,8 @@
     <Import Project="..\props\cppsystemlib.props" />
     <Import Project="..\props\numpy37-32.props" />
     <Import Project="..\props\python37-32.props" />
+    <Import Project="..\props\numpy35-32.props" />
+    <Import Project="..\props\python35-32.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -148,13 +154,15 @@
     <Import Project="..\props\numpy36.props" />
     <Import Project="..\props\numpy37-32.props" />
     <Import Project="..\props\python37-32.props" />
+    <Import Project="..\props\numpy35-32.props" />
+    <Import Project="..\props\python35-32.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <TargetExt>.pyd</TargetExt>
     <OutDir>$(ProjectDir)..\..\pysim\systems\</OutDir>
-    <TargetName>$(ProjectName).cp37-win32</TargetName>
+    <TargetName>$(ProjectName).cp35-win32</TargetName>
     <IntDir>$(ProjectDir)Intermediate\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -168,7 +176,7 @@
     <LinkIncremental>false</LinkIncremental>
     <TargetExt>.pyd</TargetExt>
     <OutDir>$(ProjectDir)..\..\pysim\systems\</OutDir>
-    <TargetName>$(ProjectName).cp36-win32</TargetName>
+    <TargetName>$(ProjectName).cp35-win32</TargetName>
     <IntDir>$(ProjectDir)Intermediate\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
