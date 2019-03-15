@@ -2,7 +2,6 @@
 #include <vector>
 #include <map>
 #include <memory>
-#include <Eigen/Dense>
 
 
 namespace pysim {
@@ -17,6 +16,7 @@ public:
     std::vector<std::string> getMatrixNames();
     void setScalar(char* name, double value);
     void setVector(char* name, std::vector<double> value);
+
     void setMatrix(char* name, std::vector<std::vector<double>> value);
     double getScalar(char* name);
     std::vector<double> getVector(char* name);

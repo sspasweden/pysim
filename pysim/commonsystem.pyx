@@ -10,9 +10,6 @@ import numpy as np
 cimport numpy as np
 from commonsystem cimport CommonSystemImpl
 cimport simulatablesystem
-cimport cppsystem
-cimport cythonsystem
-
 
 np.import_array()
 

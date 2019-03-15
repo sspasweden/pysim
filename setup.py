@@ -160,6 +160,8 @@ setup(
                                   'pysim/cppsource/CppSystem.hpp',
                                   'pysim/cppsource/PysimTypes.hpp',
                                   'pysim/cppsource/CommonSystemImpl.hpp',
+                                  'pysim/cppsource/CommonSystemImpl_p.hpp',
+                                  'pysim/cppsource/Variable_p.hpp',
                                   'pysim/cppsource/Variable.hpp',
                                   'pysim/cppsource/StoreHandler.hpp',
                                   'pysim/cppsource/CythonSystemImpl.hpp',
