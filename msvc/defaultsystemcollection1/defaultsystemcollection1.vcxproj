@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\pysim\systems\defaultsystemcollection1\cppsource\Adder.cpp" />
     <ClCompile Include="..\..\pysim\systems\defaultsystemcollection1\cppsource\Adder3D.cpp" />
+    <ClCompile Include="..\..\pysim\systems\defaultsystemcollection1\cppsource\Adder6D.cpp" />
     <ClCompile Include="..\..\pysim\systems\defaultsystemcollection1\cppsource\ControlledSpring.cpp" />
     <ClCompile Include="..\..\pysim\systems\defaultsystemcollection1\cppsource\DiscretePID.cpp" />
     <ClCompile Include="..\..\pysim\systems\defaultsystemcollection1\cppsource\Factory.cpp" />
@@ -41,6 +42,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\pysim\systems\defaultsystemcollection1\cppsource\Adder.h" />
     <ClInclude Include="..\..\pysim\systems\defaultsystemcollection1\cppsource\Adder3D.h" />
+    <ClInclude Include="..\..\pysim\systems\defaultsystemcollection1\cppsource\Adder6D.h" />
     <ClInclude Include="..\..\pysim\systems\defaultsystemcollection1\cppsource\ControlledSpring.h" />
     <ClInclude Include="..\..\pysim\systems\defaultsystemcollection1\cppsource\DiscretePID.h" />
     <ClInclude Include="..\..\pysim\systems\defaultsystemcollection1\cppsource\Factory.hpp" />
