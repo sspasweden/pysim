@@ -40,7 +40,4 @@ protected:
 
     //Outputs
     pysim::vector acceleration;
-
-    //Internal
-    pysim::vector to_global(pysim::vector);
 };

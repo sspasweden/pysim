@@ -3,7 +3,7 @@
 
 PreStepTestSystem::PreStepTestSystem(void):
     InOutTestSystem::InOutTestSystem(),
-    state_vector_derived(3, 0.0) 
+    state_vector_derived(pysim::vector::Zero(3))
 {
     OUTPUT(state_vector_derived, "");
 

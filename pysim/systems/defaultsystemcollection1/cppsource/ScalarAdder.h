@@ -26,6 +26,6 @@ protected:
 
     static const int MAX_INPUTS = 10;
 
-    pysim::vector inputs;
+    std::vector<double> inputs;
     double out;
 };

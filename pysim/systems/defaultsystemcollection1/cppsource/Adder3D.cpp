@@ -10,9 +10,9 @@ std::string Adder3D::getDocs(){
 }
 
 Adder3D::Adder3D(void) :
-    input1(3,0.0),
-    input2(3,0.0),
-    output1(3,0.0)
+    input1(pysim::vector::Zero(3)),
+    input2(pysim::vector::Zero(3)),
+    output1(pysim::vector::Zero(3))
 {
     INPUT(input1, "First vector to be added")
     INPUT(input2, "Second vector to be added")

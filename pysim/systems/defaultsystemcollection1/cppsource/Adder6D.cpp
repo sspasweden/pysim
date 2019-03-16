@@ -14,8 +14,8 @@ string Adder6D::getDocs() {
 }
 
 Adder6D::Adder6D(void) :
-	inputs(MAX_INPUTS, pysim::vector(6, 0.0)),
-	out(6, 0.0)
+	inputs(MAX_INPUTS, pysim::vector::Zero(6)),
+	out(pysim::vector::Zero(6))
 {
 	int i = 0;
 	for (auto iter = inputs.begin(); iter != inputs.end(); ++iter) {
@@ -28,7 +28,7 @@ Adder6D::Adder6D(void) :
 }
 
 void Adder6D::doStep(double time) {
-	out <<= 0, 0, 0, 0, 0, 0;
+	out << 0, 0, 0, 0, 0, 0;
 	for (auto iter = inputs.begin(); iter != inputs.end(); ++iter) {
 		out += *iter;
 	}
