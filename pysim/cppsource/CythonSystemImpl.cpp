@@ -44,7 +44,7 @@ void CythonSystemImpl::add_input(std::string name, size_t length){
     if (length == 1) {
         inputs.d_ptr->scalars[name] = new double(0);
     } else {
-        inputs.d_ptr->vectors[name] = new pysim::vector(length,0.0);
+        inputs.d_ptr->vectors[name] = new pysim::vector(length);
         inputs.d_ptr->descriptions[name] = std::string("No Description"); //TODO add descriptions in call
     }
 }
@@ -55,12 +55,12 @@ void CythonSystemImpl::add_input_scalar(std::string name, std::string desc) {
 }
 
 void CythonSystemImpl::add_input_vector(std::string name, size_t length, std::string desc) {
-    inputs.d_ptr->vectors[name] = new pysim::vector(length, 0.0);
+    inputs.d_ptr->vectors[name] = new pysim::vector(length);
     inputs.d_ptr->descriptions[name] = desc;
 }
 
 void CythonSystemImpl::add_input_matrix(std::string name, size_t rows, size_t cols, std::string desc) {
-    inputs.d_ptr->matrices[name] = new Eigen::MatrixXd(rows, cols);
+    inputs.d_ptr->matrices[name] = new pysim::matrix(rows, cols);
     inputs.d_ptr->descriptions[name] = desc;
 }
 
@@ -84,7 +84,7 @@ void CythonSystemImpl::add_output_vector(std::string name, size_t rows, std::str
 }
 
 void CythonSystemImpl::add_output_matrix(std::string name, size_t rows, size_t cols, std::string desc) {
-    outputs.d_ptr->matrices[name] = new Eigen::MatrixXd(rows, cols);
+    outputs.d_ptr->matrices[name] = new pysim::matrix(rows, cols);
     outputs.d_ptr->descriptions[name] = desc;
 }
 
@@ -121,8 +121,8 @@ void CythonSystemImpl::add_state_vector(std::string statename, std::string derna
 }
 
 void CythonSystemImpl::add_state_matrix(std::string statename, std::string dername, size_t rows, size_t cols, std::string desc) {
-    states.d_ptr->matrices[statename] = new Eigen::MatrixXd(rows, cols);
-    ders.d_ptr->matrices[dername] = new Eigen::MatrixXd(rows, cols);
+    states.d_ptr->matrices[statename] = new pysim::matrix(rows, cols);
+    ders.d_ptr->matrices[dername] = new pysim::matrix(rows, cols);
 
     d_ptr->state_to_der_map_matrices[statename] = dername;
     states.d_ptr->descriptions[statename] = std::string("No Description"); //TODO add descriptions in call'

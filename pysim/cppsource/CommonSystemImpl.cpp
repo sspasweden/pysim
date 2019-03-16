@@ -44,9 +44,7 @@ std::vector<std::string> CommonSystemImpl::getParNames<ParMatrix>() {
     for (auto i = d_ptr->par_matrices.cbegin(); i != d_ptr->par_matrices.cend(); ++i) {
         names.push_back(i->first);
     }
-    for (auto i = d_ptr->par_boost_matrices.cbegin(); i != d_ptr->par_boost_matrices.cend(); ++i) {
-        names.push_back(i->first);
-    }
+
     return names;
 }
 
@@ -125,16 +123,7 @@ ParMatrix CommonSystemImpl::getPar(char* name) {
     std::vector<std::vector<double>> out;
     if (d_ptr->par_matrices.count(name) > 0) {
         out = *d_ptr->par_matrices.at(name);
-    } else if (d_ptr->par_boost_matrices.count(name) > 0) {
-        using  boost::numeric::ublas::matrix;
-        matrix<double>* mat = d_ptr->par_boost_matrices[name];
 
-        size_t columns = mat->size2();
-        for (matrix<double>::const_iterator1 rowiter = mat->begin1(); rowiter != mat->end1(); rowiter++) {
-            std::vector<double> row(columns);
-            std::copy(rowiter.begin(), rowiter.end(), row.begin());
-            out.push_back(row);
-        }
     } else {
         std::string errstr = str(boost::format("Could not find: %1%") % name);
         throw std::invalid_argument(errstr);
@@ -146,29 +135,7 @@ template <>
 void CommonSystemImpl::setPar(char* name, ParMatrix value) {
     if (d_ptr->par_matrices.count(name) > 0) {
         *d_ptr->par_matrices.at(name) = value;
-    } else if (d_ptr->par_boost_matrices.count(name) > 0) {
-        boost::numeric::ublas::matrix<double> *inputm = d_ptr->par_boost_matrices.at(name);
 
-        //Check number of rows
-        if (value.size() != inputm->size1()) {
-            std::string errstr = str(boost::format("Error: %1% shall contain %2% rows") % name % inputm->size1());
-            throw std::invalid_argument(errstr);
-        }
-
-        //Check number of columns (for each row)
-        size_t columns = inputm->size2();
-        for (auto rowiter = value.cbegin(); rowiter != value.cend(); rowiter++) {
-            if (rowiter->size() != columns) {
-                std::string errstr = str(boost::format("Error: %1% shall contain %2% columns") % name % columns);
-                throw std::invalid_argument(errstr);
-            }
-        }
-
-        auto m1iter = inputm->begin1();
-        for (auto rowiter = value.cbegin(); rowiter != value.cend(); rowiter++) {
-            std::copy(rowiter->begin(), rowiter->end(), m1iter.begin());
-            m1iter++;
-        }
     } else {
         char errmsg[50];
         snprintf(errmsg, 50, "Could not find: %s", name);
@@ -302,16 +269,15 @@ std::vector<double*> CommonSystemImpl::getStatePointers() {
     }
 
     for (auto const&p : states.d_ptr->vectors) {
-        pysim::vector* v = p.second;
-        size_t size = v->size();
-        for (size_t i = 0; i < size; ++i) {
-            out.push_back(&(v->operator()(i)));
+        double* d = p.second->data();
+        for (int i = 0; i<p.second->size(); ++i) {
+            out.push_back(d++);
         }
     }
 
     for (auto const&p : states.d_ptr->matrices) {
+        double* d = p.second->data();
         for (int i = 0;i<p.second->size();++i){
-            double* d = p.second->data();
             out.push_back(d++);
         }
     }
@@ -335,17 +301,17 @@ std::vector<double*> CommonSystemImpl::getDerPointers() {
     for (auto const&p : states.d_ptr->vectors) {
         //the der that corresponds to the state
         pysim::vector* v = ders.d_ptr->vectors[d_ptr->state_to_der_map_vectors[p.first]];
-        size_t size = v->size();
-        for (size_t i = 0; i < size; ++i) {
-            out.push_back(&(v->operator()(i)));
+        double* d = v->data();
+        for (int i = 0; i<v->size(); ++i) {
+            out.push_back(d++);
         }
     }
 
     for (auto const&p : states.d_ptr->matrices) {
         //the der that corresponds to the state
-        Eigen::MatrixXd* m = ders.d_ptr->matrices[d_ptr->state_to_der_map_matrices[p.first]];
+        pysim::matrix* m = ders.d_ptr->matrices[d_ptr->state_to_der_map_matrices[p.first]];
+        double* d = m->data();
         for (int i = 0; i<m->size(); ++i) {
-            double* d = m->data();
             out.push_back(d++);
         }
     }

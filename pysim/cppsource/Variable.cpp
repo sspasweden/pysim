@@ -55,12 +55,12 @@ void Variable::setScalar(char* name, double value) {
 
 void Variable::setVector(char* name, std::vector<double> value) {
     if (d_ptr->vectors.count(name) > 0) {
-        auto bv = d_ptr->vectors[name];
+        pysim::vector* bv = d_ptr->vectors[name];
         if (bv->size() != value.size()) {
             std::string errstr = str(boost::format("Size of %1% is %2%") % name % bv->size());
             throw std::invalid_argument(errstr);
         }
-        std::copy(value.begin(), value.end(), bv->begin());
+        *bv = Eigen::Map<pysim::vector>(value.data(), value.size());
     } else {
         std::string errstr = str(boost::format("Could not find: %1%") % name);
         throw std::invalid_argument(errstr);
@@ -77,7 +77,7 @@ void Variable::setMatrix(char* name, std::vector<std::vector<double>> value) {
     }
 
     //Local pointer to matrix
-    MatrixXd* mp = d_ptr->matrices[name];
+    pysim::matrix* mp = d_ptr->matrices[name];
 
     //Check row size
     if (mp->rows() != (int)value.size()) {
@@ -114,9 +114,9 @@ double Variable::getScalar(char* name) {
 
 std::vector<double> Variable::getVector(char* name) {
     if (d_ptr->vectors.count(name) > 0) {
-        auto bv = d_ptr->vectors[name];
+        pysim::vector* bv = d_ptr->vectors[name];
         std::vector<double> v(bv->size());
-        std::copy(bv->begin(), bv->end(), v.begin());
+        Eigen::Map<pysim::vector>(v.data(), bv->size()) = *bv;
         return v;
     } else {
         std::string errstr = str(boost::format("Could not find: %1%") % name);
@@ -134,7 +134,7 @@ std::vector<std::vector<double>> Variable::getMatrix(char* name) {
     }
 
     //Local pointer to matrix
-    MatrixXd* mp = d_ptr->matrices[name];
+    pysim::matrix* mp = d_ptr->matrices[name];
 
     std::vector<std::vector<double>> out;
     for (int i = 0; i < mp->rows(); ++i) {

@@ -16,7 +16,7 @@ namespace pysim {
 struct VariablePrivate{
     std::map<std::string, double* > scalars;
     std::map<std::string, pysim::vector* > vectors;
-    std::map<std::string, Eigen::MatrixXd* > matrices;
+    std::map<std::string, pysim::matrix* > matrices;
     std::map<std::string, std::string> descriptions;
 };
 

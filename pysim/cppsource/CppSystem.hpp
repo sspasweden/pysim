@@ -33,46 +33,24 @@ protected:
     //
     ///////////////////////////////////////
 
-    //To be pars only, here only for backwards compatability
-    [[deprecated]]
-    void input(std::vector<double>* vars, const char* name, const char* description) {
-        par( vars, name, description);
-    };
-    [[deprecated]]
-    void input(std::vector<std::vector<double>>* vars, const char* name, const char* description) {
-        par(vars, name, description);
-    };
-    [[deprecated]]
-    void input(std::string* var, const char* name, const char* description){
-        par(var, name, description);
-    };
-    [[deprecated]]
-    void input(std::map<std::string, double>* var, const char* name, const char* description) {
-        par(var, name, description);
-    };
-    [[deprecated]]
-    void input(pysim::matrix* vars, const char* name, const char* description) {
-        par(vars, name, description);
-    };
-
     void par(std::vector<double>* vars, const char* name, const char* desc);
     void par(std::vector<std::vector<double>>* vars, const char* name, const char* desc);
     void par(std::string*, const char* name, const char* description);
     void par(std::map<std::string, double>*, const char* name, const char* description);
     void par(std::map<std::string, std::vector<double>>* var, const char* name, const char* description);
-    void par(pysim::matrix* vars, const char* name, const char* description);
+    //void par(pysim::matrix* vars, const char* name, const char* description);
 
     void input(double* var, const char* name, const char* desc);
     void input(pysim::vector* vars, const char* name, const char* description);
-    void input(Eigen::MatrixXd*  vars, const char* name, const char* description);
+    void input(pysim::matrix*  vars, const char* name, const char* description);
 
     void output(double* var, const char* name, const char* desc);
     void output(pysim::vector* vars, const char* name, const char* desc);
-    void output(Eigen::MatrixXd* vars, const char* name, const char* desc);
+    void output(pysim::matrix* vars, const char* name, const char* desc);
 
     void state(double* state, const char* stateName, double* der, const char* derName, const char* desc = "");
     void state(pysim::vector* state, const char* stateName, pysim::vector* der, const char* derName, const char* desc = "");
-    void state(Eigen::MatrixXd* state, const char* stateName, Eigen::MatrixXd* der, const char* derName, const char* desc = "");
+    void state(pysim::matrix* state, const char* stateName, pysim::matrix* der, const char* derName, const char* desc = "");
 
 
     void setNextUpdate(double t);

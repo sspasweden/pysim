@@ -27,15 +27,15 @@ struct ConnectionHandlerPrivate {
 
     std::vector<std::pair<double*, double* > > connected_scalars_inputs;
     std::vector<std::pair<pysim::vector*, pysim::vector* > > connected_vectors_inputs;
-    std::vector<std::pair<Eigen::MatrixXd*, Eigen::MatrixXd* > > connected_matrices_inputs;
+    std::vector<std::pair<pysim::matrix*, pysim::matrix* > > connected_matrices_inputs;
 
     std::vector<std::pair<double*, double* > > connected_scalars_outputs;
     std::vector<std::pair<pysim::vector*, pysim::vector* > > connected_vectors_outputs;
-    std::vector<std::pair<Eigen::MatrixXd*, Eigen::MatrixXd* > > connected_matrices_outputs;
+    std::vector<std::pair<pysim::matrix*, pysim::matrix* > > connected_matrices_outputs;
 
     std::vector<std::pair<double*, double* > > connected_scalar_states;
     std::vector<std::pair<pysim::vector*, pysim::vector* > > connected_vector_states;
-    std::vector<std::pair<Eigen::MatrixXd*, Eigen::MatrixXd* > > connected_matrix_states;
+    std::vector<std::pair<pysim::matrix*, pysim::matrix* > > connected_matrix_states;
 };
 
 ConnectionHandler::ConnectionHandler(
@@ -81,7 +81,7 @@ void ConnectionHandler::connect(char* outputname, CommonSystemImpl* inputsys, ch
     inputsys_vectors.insert(inputsys->outputs.d_ptr->vectors.begin(),
         inputsys->outputs.d_ptr->vectors.end());
 
-    std::map<std::string, Eigen::MatrixXd*> inputsys_matrices;
+    std::map<std::string, pysim::matrix*> inputsys_matrices;
     inputsys_matrices.insert(inputsys->inputs.d_ptr->matrices.begin(),
         inputsys->inputs.d_ptr->matrices.end());
     inputsys_matrices.insert(inputsys->states.d_ptr->matrices.begin(),
@@ -226,7 +226,7 @@ void copy(std::pair<pysim::vector *,pysim::vector *> vi){
     *(vi.second) = *(vi.first);
 }
 
-void check_copy(std::pair<Eigen::MatrixXd *,Eigen::MatrixXd *> vi){
+void check_copy(std::pair<pysim::matrix *,pysim::matrix *> vi){
     if (vi.first->hasNaN()){
         throw std::runtime_error("Output from system is NaN");
     }
