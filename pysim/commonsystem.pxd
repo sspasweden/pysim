@@ -29,6 +29,11 @@ cdef extern from "CommonSystemImpl.hpp" namespace "pysim":
         ConnectionHandler connectionHandler
         vector[string] subsystem_names
 
+        void __preSim() except +
+        void __preStep() except +
+        void __doStep(double) except +
+        void __postStep() except +
+
         void add_subsystem(simulatablesystem.SimulatableSystemInterface* , string) except +
         simulatablesystem.SimulatableSystemInterface* get_subsystem(string) except +
 
@@ -61,6 +66,8 @@ cdef extern from "StoreHandler.hpp" namespace "pysim":
 cdef class CommonSystem(simulatablesystem.SimulatableSystem):
     cdef CommonSystemImpl * _c_s
     cdef dict _subsystems
+    cpdef void _initialize(CommonSystem)
+    cpdef void _evaluate(CommonSystem, double)
 
 cdef class Parameters:
     cdef CommonSystemImpl* _c_sys

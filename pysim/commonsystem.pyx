@@ -141,6 +141,56 @@ cdef class CommonSystem:
         bname = bytes(name,'utf-8')
         self._c_s.add_compare_smaller(bname,value)
 
+    def initialize(self, **kwargs):
+        """Set pars and inputs from kwargs and then initialize system"""
+        self.set_inputs(**kwargs)
+        self._initialize()
+
+    cpdef void _initialize(self):
+        """Intialize system"""
+        self._c_s.__preSim()
+
+    def evaluate(self, time=0.0, **kwargs):
+        """Evaluate a single timestep"""
+        self.set_inputs(**kwargs)
+        self._evaluate(time)
+
+    cpdef void _evaluate(self, double time):
+        """Evaluate a single timestep"""
+        self._c_s.__preStep()
+        self._c_s.__doStep(time)
+        self._c_s.__postStep()
+
+    def set_inputs(self, **kwargs):
+        """Set pars, inputs and states from dict"""
+        pars = dir(self.pars)
+        inputs = dir(self.inputs)
+        states = dir(self.states)
+        
+        for var_name, value in kwargs.items():
+            if var_name in pars:
+                setattr(self.pars, var_name, value)
+            elif var_name in inputs:
+                setattr(self.inputs, var_name, value)
+            elif var_name in states:
+                setattr(self.states, var_name, value)
+            else:
+                print("Variable {} is not a par, input"
+                      " or state on this system".format(var_name))
+
+    def get_outputs(self):
+        """Return current values of outputs and ders as a dict"""
+        out = {}
+        outputs = dir(self.outputs)
+        ders = dir(self.ders)
+
+        for var_name in outputs:
+            out[var_name] = getattr(self.outputs, var_name)
+
+        for var_name in ders:
+            out[var_name] = getattr(self.ders, var_name)
+
+        return out
 
 cdef class Results:
     """ Class containing the results of a simulation.

@@ -342,5 +342,22 @@ def test_der_as_output():
     output_from_output = sys3.res.input_output_scalar
     assert np.allclose(output_from_der, output_from_output)
 
+def test_single_evaluation():
+    """Test a single static evaluation of a system"""
+    input = {"input_vector": [8, 3, 9]}
+    output_expected = {"input_output_vector": [8, 3, 9]}
+
+    sys = InOutTestSystem()
+    sys.initialize(**input)
+    output = sys.get_outputs()
+
+    assert dict(output, **output_expected) != output
+
+    sys.evaluate()
+    output = sys.get_outputs()
+
+    assert dict(output, **output_expected) == output
+
 if __name__ == "__main__":
-    test_input_matrix_change(InOutTestSystem)
+    test_single_evaluation()
+    #test_input_matrix_change(InOutTestSystem)
