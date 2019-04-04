@@ -166,6 +166,7 @@ setup(
                                   'pysim/cppsource/StoreHandler.hpp',
                                   'pysim/cppsource/CythonSystemImpl.hpp',
                                   'pysim/cppsource/ConnectionHandler.hpp',
+                                  'pysim/cppsource/CppSimulation.hpp'
                                   ]),
                 ('pysim',['pysim/cppsystem.pxd',
                           'pysim/commonsystem.pxd',
