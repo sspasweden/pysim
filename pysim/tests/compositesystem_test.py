@@ -32,13 +32,13 @@ class ControlledSpring(Sys):
 
         wave_sys.connections.add_connection("signal", msd, "f")
 
-        self.add_input_scalar("amp")
+        self.inputs.add_scalar("amp")
         self.connections.add_connection("amp", wave_sys, "amplitude")
 
-        self.add_output_scalar("out")
+        self.outputs.add_scalar("out")
         msd.connections.add_connection("x1", self, "out")
 
-        self.add_output_scalar("signal")
+        self.outputs.add_scalar("signal")
         wave_sys.connections.add_connection("signal", self, "signal")
 
 
@@ -54,11 +54,11 @@ class CompositeSpring(Sys):
         msd.inputs.f = 0
         self.add_subsystem(msd,"msd")
 
-        self.add_input_scalar("force", "force acting on mass")
+        self.inputs.add_scalar("force", "force acting on mass")
         self.inputs.force = 0
         self.connections.add_connection("force", msd, "f")
 
-        self.add_output_scalar("position", "Position")
+        self.outputs.add_scalar("position", "Position")
         msd.connections.add_connection("x1", self, "position")
 
 
@@ -71,11 +71,11 @@ class NestedCompositeSpring(Sys):
         composite_spring = CompositeSpring()
         self.add_subsystem(composite_spring,"composite_spring")
 
-        self.add_input_scalar("force", "force acting on mass")
+        self.inputs.add_scalar("force", "force acting on mass")
         self.inputs.force = 0
         self.connections.add_connection("force", composite_spring, "force")
 
-        self.add_output_scalar("position", "Position of mass")
+        self.outputs.add_scalar("position", "Position of mass")
         self.outputs.position = 0
         composite_spring.connections.add_connection("position", self, "position")
 
@@ -86,15 +86,15 @@ class CompositeSquareWave(Sys):
         wave_sys = SquareWave()
         self.add_subsystem(wave_sys,"wave_sys")
 
-        self.add_input_scalar("freq", "frequency of wave")
+        self.inputs.add_scalar("freq", "frequency of wave")
         self.inputs.freq = 0.1
         self.connections.add_connection("freq", wave_sys, "freq")
 
-        self.add_input_scalar("amplitude", "amplitude of wave")
+        self.inputs.add_scalar("amplitude", "amplitude of wave")
         self.inputs.amplitude = 50
         self.connections.add_connection("amplitude", wave_sys, "amplitude")
 
-        self.add_output_scalar("signal", "signal from wave")
+        self.outputs.add_scalar("signal", "signal from wave")
         wave_sys.connections.add_connection("signal", self, "signal")
 
 
@@ -104,15 +104,15 @@ class NestedCompositeSquareWave(Sys):
         wave_sys = CompositeSquareWave()
         self.add_subsystem(wave_sys,"wave_sys")
 
-        self.add_input_scalar("freq", "frequency of wave")
+        self.inputs.add_scalar("freq", "frequency of wave")
         self.inputs.freq = 0.1
         self.connections.add_connection("freq", wave_sys, "freq")
 
-        self.add_input_scalar("amplitude", "amplitude of wave")
+        self.inputs.add_scalar("amplitude", "amplitude of wave")
         self.inputs.amplitude = 50
         self.connections.add_connection("amplitude", wave_sys, "amplitude")
 
-        self.add_output_scalar("signal", "signal from wave")
+        self.outputs.add_scalar("signal", "signal from wave")
         wave_sys.connections.add_connection("signal", self, "signal")
 
 class CompositeTestSystem(Sys):
@@ -125,45 +125,45 @@ class CompositeTestSystem(Sys):
             self.add_subsystem(sys,"subsystem_{}".format(i))
 
             name = "scalar_in_{}".format(i)
-            self.add_input_scalar(name)
+            self.inputs.add_scalar(name)
             setattr(self.inputs, name, -1)
             self.connections.add_connection(name, sys, "input_scalar")
 
             name = "output_scalar_{}".format(i)
-            self.add_output_scalar(name)
+            self.outputs.add_scalar(name)
             setattr(self.outputs, name, -1)
             sys.connections.add_connection("input_output_scalar", self, name)
 
 
             name = "vector_in_{}".format(i)
-            self.add_input_vector(name, 3)
+            self.inputs.add_vector(name, 3)
             setattr(self.inputs, name, [1,2,3])
             self.connections.add_connection(name, sys, "input_vector")
 
             name = "output_vector_{}".format(i)
-            self.add_output_vector(name, 3)
+            self.outputs.add_vector(name, 3)
             setattr(self.outputs, name, [-1,-1,-1])
             sys.connections.add_connection("input_output_vector", self, name)
 
 
             name = "output_state_vector_{}".format(i)
-            self.add_output_vector(name, 3)
+            self.outputs.add_vector(name, 3)
             setattr(self.outputs, name, [-1,-1,-1])
             sys.connections.add_connection("state_vector", self, name)
 
 
             name = "matrix_in_{}".format(i)
-            self.add_input_matrix(name, 3, 3)
+            self.inputs.add_matrix(name, 3, 3)
             self.connections.add_connection(name, sys, "input_matrix")
 
             name = "output_matrix_{}".format(i)
-            self.add_output_matrix(name, 3, 3)
+            self.outputs.add_matrix(name, 3, 3)
             setattr(self.outputs, name, ((-1,-1,-1),(-1,-1,-1),(-1,-1,-1)))
             sys.connections.add_connection("input_output_matrix", self, name)
 
 
             name = "output_state_matrix_{}".format(i)
-            self.add_output_matrix(name, 3, 3)
+            self.outputs.add_matrix(name, 3, 3)
             setattr(self.outputs, name, ((-1,-1,-1),(-1,-1,-1),(-1,-1,-1)))
             sys.connections.add_connection("state_matrix", self, name)
 

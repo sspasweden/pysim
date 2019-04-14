@@ -12,7 +12,7 @@ from pysim.cythonsystem import Sys
 
 
 class PostStepTestSystem(InOutTestSystem):
-    """Test system for testing post step functionality 
+    """Test system for testing post step functionality
     for a cython system"""
     def __init__(self):
         super().__init__()
@@ -23,21 +23,21 @@ class PostStepTestSystem(InOutTestSystem):
         self.states.state_matrix = np.ones((3,3))*7.89*2
 
 class PostStepCompositeSystem(Sys):
-    """Composite test system for testing post step 
+    """Composite test system for testing post step
     functionality within a composite system"""
     def __init__(self):
         ps = PostStepTestSystem()
         self.add_subsystem(ps, "ps")
 
-        self.add_output_scalar("state_scalar_out")
+        self.outputs.add_scalar("state_scalar_out")
         self.outputs.state_scalar_out = 0
         ps.connections.add_connection("state_scalar", self, "state_scalar_out")
 
-        self.add_output_vector("state_vector_out", 3)
+        self.outputs.add_vector("state_vector_out", 3)
         self.outputs.state_vector_out = [0,0,0]
         ps.connections.add_connection("state_vector", self, "state_vector_out")
 
-        self.add_output_matrix("state_matrix_out", 3, 3)
+        self.outputs.add_matrix("state_matrix_out", 3, 3)
         self.outputs.state_matrix_out = [[0,0,0],[0,0,0],[0,0,0]]
         ps.connections.add_connection("state_matrix", self, "state_matrix_out")
 

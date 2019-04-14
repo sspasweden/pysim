@@ -15,7 +15,7 @@ class PreStepTestSystem(InOutTestSystem):
     for a cython system"""
     def __init__(self):
         super().__init__()
-        self.add_output_vector('state_vector_derived', 3, '')
+        self.outputs.add_vector('state_vector_derived', 3, '')
         self.system_pos = np.array([10, 5, -2])
 
     def pre_step(self):
@@ -29,7 +29,7 @@ class PreStepCompositeSystem(Sys):
         ps = PreStepTestSystem()
         self.add_subsystem(ps, 'ps')
 
-        self.add_output_vector("state_vector_derived", 3)
+        self.outputs.add_vector("state_vector_derived", 3)
         self.outputs.state_vector_derived = [0,0,0]
         ps.connections.add_connection("state_vector_derived", self, "state_vector_derived")
 

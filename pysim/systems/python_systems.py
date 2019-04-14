@@ -8,10 +8,12 @@ class VanDerPol(Sys):
     """Simple example of a class representing a VanDerPol oscillator.
     """
     def __init__(self):
-        self.add_state_scalar("x", "dx")
-        self.add_state_scalar("y", "dy")
-        self.add_input_scalar("a")
-        self.add_input_scalar("b")
+        self.states.add_scalar("x")
+        self.ders.add_scalar("dx")
+        self.states.add_scalar("y")
+        self.ders.add_scalar("dy")
+        self.inputs.add_scalar("a")
+        self.inputs.add_scalar("b")
         self.inputs.a = 1.0
         self.inputs.b = 1.0
         self.states.x = 1.0
@@ -36,8 +38,10 @@ class MassSpringDamper(Sys):
     def __init__(self):
         """Setup two states (one dimensional vectors for now). Initial 
         conditions are simular to those in the build in c++ system"""
-        self.add_state_scalar("x1", "dx1")
-        self.add_state_scalar("x2", "dx2")
+        self.states.add_scalar("x1")
+        self.ders.add_scalar("dx1")
+        self.states.add_scalar("x2")
+        self.ders.add_scalar("dx2")
         self.states.x1 = 1
         self.states.x2 = 0
 
@@ -61,20 +65,23 @@ class InOutTestSystem(Sys):
     with regards to the input output handling
     """
     def __init__(self):
-        self.add_input_scalar("input_scalar")
-        self.add_input_vector("input_vector",3)
-        self.add_input_matrix("input_matrix",3,3)
+        self.inputs.add_scalar("input_scalar")
+        self.inputs.add_vector("input_vector",3)
+        self.inputs.add_matrix("input_matrix",3,3)
 
-        self.add_state_scalar("state_scalar","der_scalar")
-        self.add_state_vector("state_vector","der_vector", 3)
-        self.add_state_matrix("state_matrix","der_matrix", 3, 3)
+        self.states.add_scalar("state_scalar")
+        self.ders.add_scalar("der_scalar")
+        self.states.add_vector("state_vector", 3)
+        self.ders.add_vector("der_vector", 3)
+        self.states.add_matrix("state_matrix", 3, 3)
+        self.ders.add_matrix("der_matrix", 3, 3)
 
-        self.add_output_scalar("input_output_scalar")
-        self.add_output_vector("input_output_vector",3)
-        self.add_output_matrix("input_output_matrix",3,3)
-        self.add_output_scalar("state_output_scalar")
-        self.add_output_vector("state_output_vector",3)
-        self.add_output_matrix("state_output_matrix",3,3)
+        self.outputs.add_scalar("input_output_scalar")
+        self.outputs.add_vector("input_output_vector",3)
+        self.outputs.add_matrix("input_output_matrix",3,3)
+        self.outputs.add_scalar("state_output_scalar")
+        self.outputs.add_vector("state_output_vector",3)
+        self.outputs.add_matrix("state_output_matrix",3,3)
 
         self.inputs.input_scalar = 0.0
         self.inputs.input_vector = [0.0, 0.0, 0.0]

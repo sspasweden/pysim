@@ -16,13 +16,13 @@ class CompositeVanDerPol(Sys):
         vdp = VanDerPol()
         self.add_subsystem(vdp, 'vdp')
 
-        self.add_output_scalar("x")
+        self.outputs.add_scalar("x")
         vdp.connections.add_connection("x", self, "x")
 
-        self.add_output_scalar("dx")
+        self.outputs.add_scalar("dx")
         vdp.connections.add_connection("dx", self, "dx")
 
-        self.add_input_scalar("a")
+        self.inputs.add_scalar("a")
         self.inputs.a = 1
         self.connections.add_connection("a", vdp, "a")
 

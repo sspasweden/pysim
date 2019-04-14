@@ -16,13 +16,13 @@ __copyright__ = 'Copyright (c) 2014-2017 SSPA Sweden AB'
 
 class CompositeTest(Sys):
     def __init__(self):
-        self.add_input_scalar("amp", "")
+        self.inputs.add_scalar("amp", "")
         self.inputs.amp = 0
 
-        self.add_output_scalar("out", "")
+        self.outputs.add_scalar("out", "")
         self.outputs.out = 0
 
-        self.add_output_scalar("signal", "")
+        self.outputs.add_scalar("signal", "")
         self.outputs.signal = 0
 
 #pytest.skip("Temporarily skipped", allow_module_level=True)
