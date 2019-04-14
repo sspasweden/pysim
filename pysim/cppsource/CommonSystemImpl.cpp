@@ -264,23 +264,7 @@ void CommonSystemImpl::__copystateoutputs() {
 
 std::vector<double*> CommonSystemImpl::getStatePointers() {
     std::vector<double*> out;
-    for (auto const& p : states.d_ptr->scalars) {
-        out.push_back(p.second);
-    }
-
-    for (auto const&p : states.d_ptr->vectors) {
-        double* d = p.second->data();
-        for (int i = 0; i<p.second->size(); ++i) {
-            out.push_back(d++);
-        }
-    }
-
-    for (auto const&p : states.d_ptr->matrices) {
-        double* d = p.second->data();
-        for (int i = 0;i<p.second->size();++i){
-            out.push_back(d++);
-        }
-    }
+    boost::range::push_back(out, states.getPointers());
 
     // Subsystems
     for (auto const &sys : d_ptr->subsystems_vec) {
@@ -293,28 +277,7 @@ std::vector<double*> CommonSystemImpl::getDerPointers() {
     //In this function we iterate over the state scalars to
     //get the ders in the same order as the states.
     std::vector<double*> out;
-    for (auto const& p : states.d_ptr->scalars) {
-        //push the der that corresponds to the state
-        out.push_back(ders.d_ptr->scalars[d_ptr->state_to_der_map_scalars[p.first]]);
-    }
-
-    for (auto const&p : states.d_ptr->vectors) {
-        //the der that corresponds to the state
-        pysim::vector* v = ders.d_ptr->vectors[d_ptr->state_to_der_map_vectors[p.first]];
-        double* d = v->data();
-        for (int i = 0; i<v->size(); ++i) {
-            out.push_back(d++);
-        }
-    }
-
-    for (auto const&p : states.d_ptr->matrices) {
-        //the der that corresponds to the state
-        pysim::matrix* m = ders.d_ptr->matrices[d_ptr->state_to_der_map_matrices[p.first]];
-        double* d = m->data();
-        for (int i = 0; i<m->size(); ++i) {
-            out.push_back(d++);
-        }
-    }
+    boost::range::push_back(out, ders.getPointers());
 
     // Subsystems
     for (auto const &sys : d_ptr->subsystems_vec) {
@@ -334,7 +297,7 @@ void CommonSystemImpl::doStoreStep(double time) {
 
 
 
-//Put the state, der, input or output named "name" in the vector of pointers 
+//Put the state, der, input or output named "name" in the vector of pointers
 //to be stored. If none with "name" is found the function raises an invalid_argument
 //exception.
 void  CommonSystemImpl::store(const char* name) {
