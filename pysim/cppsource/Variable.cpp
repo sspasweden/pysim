@@ -152,6 +152,11 @@ void Variable::addScalar(std::string name, std::string desc)
 
 void Variable::add(std::string name, double * ptr, std::string desc)
 {
+    boost::algorithm::trim(name);
+    if (this->contains(name)) {
+        std::string errstr = str(boost::format("Variable already exists: %1%") % name);
+        throw std::invalid_argument(errstr);
+    }
     this->d_ptr->scalarNames.push_back(name);
     this->d_ptr->scalars[name] = ptr;
     this->d_ptr->descriptions[name] = desc;
@@ -166,6 +171,11 @@ void Variable::addVector(std::string name, size_t length, std::string desc)
 
 void Variable::add(std::string name, vector * ptr, std::string desc)
 {
+    boost::algorithm::trim(name);
+    if (this->contains(name)) {
+        std::string errstr = str(boost::format("Variable already exists: %1%") % name);
+        throw std::invalid_argument(errstr);
+    }
     this->d_ptr->vectorNames.push_back(name);
     this->d_ptr->vectors[name] = ptr;
     this->d_ptr->descriptions[name] = desc;
@@ -180,6 +190,11 @@ void Variable::addMatrix(std::string name, size_t rows, size_t cols, std::string
 
 void Variable::add(std::string name, matrix * ptr, std::string desc)
 {
+    boost::algorithm::trim(name);
+    if (this->contains(name)) {
+        std::string errstr = str(boost::format("Variable already exists: %1%") % name);
+        throw std::invalid_argument(errstr);
+    }
     this->d_ptr->matrixNames.push_back(name);
     this->d_ptr->matrices[name] = ptr;
     this->d_ptr->descriptions[name] = desc;
@@ -206,6 +221,17 @@ std::vector<double*> Variable::getPointers()
             out.push_back(d++);
         }
     }
+
+    return out;
+}
+
+bool Variable::contains(std::string el)
+{
+    bool out = false;
+
+    out = this->d_ptr->scalars.count(el) > 0 || out;
+    out = this->d_ptr->vectors.count(el) > 0 || out;
+    out = this->d_ptr->matrices.count(el) > 0 || out;
 
     return out;
 }

@@ -32,6 +32,7 @@ public:
     void add(std::string name, pysim::matrix* ptr, std::string desc);
 
     std::vector<double*> getPointers();
+    bool contains(std::string);
 
     std::map<std::string, std::string> getDescriptionMap();
 
