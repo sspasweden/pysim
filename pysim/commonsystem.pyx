@@ -1,6 +1,6 @@
 """ Systems used for simulation.
 
-Base classes for systems. They are inherited by :obj:`CppSystems` and 
+Base classes for systems. They are inherited by :obj:`CppSystems` and
 :obj:`CythonSystems`.
 """
 
@@ -43,7 +43,7 @@ cdef class CommonSystem:
     connections : :obj:`pysim.connections.Connections`
         The connections from this system to other systems
     res : :obj:`Results`
-        The stored values from the simulation.        
+        The stored values from the simulation.
 
     """
     def __cinit__(self):
@@ -79,7 +79,7 @@ cdef class CommonSystem:
         bs = bytes(name,'utf-8')
         self._c_s.store(bs)
         self.stores.append(name)
-        
+
     def store_all(self):
         """Store all inputs, outputs, states and ders in the system.
         """
@@ -96,7 +96,7 @@ cdef class CommonSystem:
             self.store(output)
 
     def set_store_interval(self, interval):
-        """Set the store interval of this system. 
+        """Set the store interval of this system.
 
         By default the
         store interval for all systems in a simulation is set by
@@ -121,7 +121,7 @@ cdef class CommonSystem:
              Name of the variable to watch.
         value: float
              If the variable is below this value then break
-  
+
         """
         bname = bytes(name,'utf-8')
         self._c_s.add_compare_greater(bname,value)
@@ -129,9 +129,9 @@ cdef class CommonSystem:
     def add_break_smaller(self,name,value):
         """Add a break that will be activated if the value of the variable
         or state is smaller than the value supplied as argument.
-        
+
         Parameters
-        ---------- 
+        ----------
             name : str
                 Name of the variable to watch
             value : double
@@ -166,7 +166,7 @@ cdef class CommonSystem:
         pars = dir(self.pars)
         inputs = dir(self.inputs)
         states = dir(self.states)
-        
+
         for var_name, value in kwargs.items():
             if var_name in pars:
                 setattr(self.pars, var_name, value)
@@ -199,7 +199,7 @@ cdef class Results:
     can be scalars, vectors or matrices.
     """
 
-    @staticmethod 
+    @staticmethod
     cdef _create(StoreHandler* ptr):
         p = Results()
         p.shp =ptr
@@ -223,7 +223,7 @@ cdef class Results:
         size = self.shp.getStoreSize()
         bs = bytes(name,'utf-8')
         if name == "time":
-            a = np.zeros(size, dtype=np.float64) 
+            a = np.zeros(size, dtype=np.float64)
             self.shp.fillWithTime(&a[0])
             return a
         elif name in unicodenames:
@@ -251,7 +251,7 @@ cdef class Parameters:
     """Contains all the parameters for the system.
     """
 
-    @staticmethod 
+    @staticmethod
     cdef _create(CommonSystemImpl* ptr):
         p = Parameters()
         p._c_sys = ptr
@@ -332,15 +332,30 @@ cdef class Parameters:
 
 cdef class PysimVars:
     """Contains all the variables for the system.
-    
+
     Each attribute of this class correspond to a variable of the system.
     """
 
-    @staticmethod 
+    @staticmethod
     cdef _create(Variable* ptr):
         p = PysimVars()
         p._var_p = ptr
         return p
+
+    def add_scalar(self, name, desc=''):
+        bname = bytes(name, 'utf-8')
+        bdesc = bytes(desc, 'utf-8')
+        self._var_p.addScalar(bname, bdesc)
+
+    def add_vector(self, name, size_t length, desc=''):
+        bname = bytes(name, 'utf-8')
+        bdesc = bytes(desc, 'utf-8')
+        self._var_p.addVector(bname, length, bdesc)
+
+    def add_matrix(self, name, size_t rows, size_t cols, desc=''):
+        bname = bytes(name, 'utf-8')
+        bdesc = bytes(desc, 'utf-8')
+        self._var_p.addMatrix(bname, rows, cols, bdesc)
 
     def __dir__(self):
         scalarnames = self._var_p.getScalarNames()

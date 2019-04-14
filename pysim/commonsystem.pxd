@@ -11,12 +11,15 @@ cdef extern from "Variable.hpp" namespace "pysim":
         vector[string] getMatrixNames()
         vector[vector[double]] getMatrix(char* name) except +
         void setMatrix(char*, vector[vector[double]]) except +
+        void addMatrix(string, size_t, size_t, string) except +
         vector[string] getVectorNames()
         vector[double] getVector(char* name) except +
         void setVector(char*, vector[double]) except +
+        void addVector(string, size_t, string) except +
         vector[string] getScalarNames()
         void setScalar(char*, double) except +
         double getScalar(char*) except +
+        void addScalar(string, string) except +
         map[string,string] getDescriptionMap()
 
 cdef extern from "CommonSystemImpl.hpp" namespace "pysim":

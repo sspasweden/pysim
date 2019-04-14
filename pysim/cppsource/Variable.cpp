@@ -5,8 +5,6 @@
 #include <string>
 #include <boost/format.hpp>
 
-#include "PysimTypes.hpp"
-
 #include "Variable_p.hpp"
 
 using std::string;
@@ -145,6 +143,43 @@ std::vector<std::vector<double>> Variable::getMatrix(char* name) {
         out.push_back(out_row);
     }
     return out;
+}
+
+void Variable::addScalar(std::string name, std::string desc)
+{
+    this->addScalar(name, new double(0), desc);
+}
+
+void Variable::addScalar(std::string name, double * ptr, std::string desc)
+{
+    this->d_ptr->scalars[name] = ptr;
+    this->d_ptr->descriptions[name] = desc;
+}
+
+void Variable::addVector(std::string name, size_t length, std::string desc)
+{
+    pysim::vector* tmp = new pysim::vector(length);
+    tmp->setZero();
+    this->addVector(name, tmp, desc);
+}
+
+void Variable::addVector(std::string name, vector * ptr, std::string desc)
+{
+    this->d_ptr->vectors[name] = ptr;
+    this->d_ptr->descriptions[name] = desc;
+}
+
+void Variable::addMatrix(std::string name, size_t rows, size_t cols, std::string desc)
+{
+    pysim::matrix* tmp = new pysim::matrix(rows, cols);
+    tmp->setZero();
+    this->addMatrix(name, tmp, desc);
+}
+
+void Variable::addMatrix(std::string name, matrix * ptr, std::string desc)
+{
+    this->d_ptr->matrices[name] = ptr;
+    this->d_ptr->descriptions[name] = desc;
 }
 
 std::map<std::string, std::string> Variable::getDescriptionMap() {
