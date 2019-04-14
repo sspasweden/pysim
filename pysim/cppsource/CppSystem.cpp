@@ -29,49 +29,41 @@ CppSystem::~CppSystem() {
 ///////////////////////////////////////
 
 void CppSystem::state(double* state, const char* stateName, double* der, const char* derName,const char* description) {
-    string desc_string(description);
+
     string stateNameString(stateName);
     boost::algorithm::trim(stateNameString);
-    states.d_ptr->scalars[stateNameString] = state;
-    states.d_ptr->descriptions[stateName] = desc_string;
+    states.addScalar(stateNameString, state, description);
 
     string derNameString(derName);
     boost::algorithm::trim(derNameString);
-    ders.d_ptr->scalars[derNameString] = der;
-    ders.d_ptr->descriptions[derNameString] = desc_string;
+    ders.addScalar(derNameString, der, description);
 
     d_ptr->state_to_der_map_scalars[stateNameString] = derNameString;
 
 }
 
 void CppSystem::state(pysim::vector* state, const char* stateName, pysim::vector* der, const char* derName, const char* description) {
-    string desc_string(description);
 
     string stateNameString(stateName);
     boost::algorithm::trim(stateNameString);
-    states.d_ptr->vectors[stateNameString] = state;
-    states.d_ptr->descriptions[stateName] = desc_string;
+    states.addVector(stateNameString, state, description);
 
     string derNameString(derName);
     boost::algorithm::trim(derNameString);
-    ders.d_ptr->vectors[derNameString] = der;
-    ders.d_ptr->descriptions[derNameString] = desc_string;
+    ders.addVector(derNameString, der, description);
 
     d_ptr->state_to_der_map_vectors[stateNameString] = derNameString;
 }
 
 void CppSystem::state(pysim::matrix* state, const char* stateName, pysim::matrix* der, const char* derName, const char* description) {
-    string desc_string(description);
 
     string stateNameString(stateName);
     boost::algorithm::trim(stateNameString);
-    states.d_ptr->matrices[stateNameString] = state;
-    states.d_ptr->descriptions[stateName] = desc_string;
+    states.addMatrix(stateNameString, state, description);
 
     string derNameString(derName);
     boost::algorithm::trim(derNameString);
-    ders.d_ptr->matrices[derNameString] = der;
-    ders.d_ptr->descriptions[derNameString] = desc_string;
+    ders.addMatrix(derNameString, der, description);
 
     d_ptr->state_to_der_map_matrices[stateNameString] = derNameString;
 }
@@ -80,8 +72,7 @@ void CppSystem::state(pysim::matrix* state, const char* stateName, pysim::matrix
 void CppSystem::input(double* var, const char* name, const char* description) {
     std::string str(name);
     boost::algorithm::trim(str);
-    inputs.d_ptr->scalars[str] = var;
-    inputs.d_ptr->descriptions[str] = string(description);
+    inputs.addScalar(str, var, description);
 }
 
 void CppSystem::par(std::vector<double>* var, const char* name, const char* description) {
@@ -103,15 +94,13 @@ void CppSystem::par(std::vector<std::vector<double>>* var, const char* name, con
 void CppSystem::input(pysim::vector* vars, const char* name, const char* description) {
     string str(name);
     boost::algorithm::trim(str);
-    inputs.d_ptr->vectors[str] = vars;
-    inputs.d_ptr->descriptions[str] = string(description);
+    inputs.addVector(str, vars, description);
 }
 
 void CppSystem::input(pysim::matrix* var, const char* name, const char* description) {
     string str(name);
     boost::algorithm::trim(str);
-    inputs.d_ptr->matrices[str] = var;
-    inputs.d_ptr->descriptions[str] = string(description);
+    inputs.addMatrix(str, var, description);
 }
 
 
@@ -139,22 +128,19 @@ void CppSystem::par(std::map<string, std::vector<double>>* var, const char* name
 void CppSystem::output(double* var, const char* name, const char* description) {
     string str(name);
     boost::algorithm::trim(str);
-    outputs.d_ptr->scalars[str] = var;
-    outputs.d_ptr->descriptions[str] = string(description);
+    outputs.addScalar(str, var, description);
 }
 
 void CppSystem::output(pysim::vector* vars, const char* name, const char* description) {
     string str(name);
     boost::algorithm::trim(str);
-    outputs.d_ptr->vectors[str] = vars;
-    outputs.d_ptr->descriptions[str] = string(description);
+    outputs.addVector(str, vars, description);
 }
 
 void CppSystem::output(pysim::matrix* var, const char* name, const char* description) {
     string str(name);
     boost::algorithm::trim(str);
-    outputs.d_ptr->matrices[str] = var;
-    outputs.d_ptr->descriptions[str] = string(description);
+    outputs.addMatrix(str, var, description);
 }
 
 void CppSystem::setDiscrete(bool d) {
