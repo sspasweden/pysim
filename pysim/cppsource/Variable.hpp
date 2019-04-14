@@ -25,11 +25,13 @@ public:
     std::vector<std::vector<double>> getMatrix(char* name);
 
     void addScalar(std::string name, std::string desc);
-    void addScalar(std::string name, double* ptr, std::string desc);
+    void add(std::string name, double* ptr, std::string desc);
     void addVector(std::string name, size_t length, std::string desc);
-    void addVector(std::string name, pysim::vector* ptr, std::string desc);
+    void add(std::string name, pysim::vector* ptr, std::string desc);
     void addMatrix(std::string name, size_t rows, size_t cols, std::string desc);
-    void addMatrix(std::string name, pysim::matrix* ptr, std::string desc);
+    void add(std::string name, pysim::matrix* ptr, std::string desc);
+
+    std::vector<double*> getPointers();
 
     std::map<std::string, std::string> getDescriptionMap();
 

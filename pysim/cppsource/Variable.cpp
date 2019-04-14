@@ -147,11 +147,12 @@ std::vector<std::vector<double>> Variable::getMatrix(char* name) {
 
 void Variable::addScalar(std::string name, std::string desc)
 {
-    this->addScalar(name, new double(0), desc);
+    this->add(name, new double(0), desc);
 }
 
-void Variable::addScalar(std::string name, double * ptr, std::string desc)
+void Variable::add(std::string name, double * ptr, std::string desc)
 {
+    this->d_ptr->scalarNames.push_back(name);
     this->d_ptr->scalars[name] = ptr;
     this->d_ptr->descriptions[name] = desc;
 }
@@ -160,11 +161,12 @@ void Variable::addVector(std::string name, size_t length, std::string desc)
 {
     pysim::vector* tmp = new pysim::vector(length);
     tmp->setZero();
-    this->addVector(name, tmp, desc);
+    this->add(name, tmp, desc);
 }
 
-void Variable::addVector(std::string name, vector * ptr, std::string desc)
+void Variable::add(std::string name, vector * ptr, std::string desc)
 {
+    this->d_ptr->vectorNames.push_back(name);
     this->d_ptr->vectors[name] = ptr;
     this->d_ptr->descriptions[name] = desc;
 }
@@ -173,13 +175,39 @@ void Variable::addMatrix(std::string name, size_t rows, size_t cols, std::string
 {
     pysim::matrix* tmp = new pysim::matrix(rows, cols);
     tmp->setZero();
-    this->addMatrix(name, tmp, desc);
+    this->add(name, tmp, desc);
 }
 
-void Variable::addMatrix(std::string name, matrix * ptr, std::string desc)
+void Variable::add(std::string name, matrix * ptr, std::string desc)
 {
+    this->d_ptr->matrixNames.push_back(name);
     this->d_ptr->matrices[name] = ptr;
     this->d_ptr->descriptions[name] = desc;
+}
+
+std::vector<double*> Variable::getPointers()
+{
+    std::vector<double*> out;
+    // Scalars
+    for (auto const& p : this->d_ptr->scalarNames) {
+        out.push_back(this->d_ptr->scalars[p]);
+    }
+    // Vectors
+    for (auto const&p : this->d_ptr->vectorNames) {
+        double* d = this->d_ptr->vectors[p]->data();
+        for (int i = 0; i < this->d_ptr->vectors[p]->size(); ++i) {
+            out.push_back(d++);
+        }
+    }
+    // Matrices
+    for (auto const&p : this->d_ptr->matrixNames) {
+        double* d = this->d_ptr->matrices[p]->data();
+        for (int i = 0; i < this->d_ptr->matrices[p]->size(); ++i) {
+            out.push_back(d++);
+        }
+    }
+
+    return out;
 }
 
 std::map<std::string, std::string> Variable::getDescriptionMap() {
