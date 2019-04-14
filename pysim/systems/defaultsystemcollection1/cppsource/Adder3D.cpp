@@ -15,7 +15,7 @@ Adder3D::Adder3D(void) :
     output1(pysim::vector::Zero(3))
 {
     INPUT(input1, "First vector to be added")
-    INPUT(input2, "Second vector to be added")
+    INPUT(input2, "Second vector to be added");
 
     OUTPUT(output1, "Result of the addition")
 }

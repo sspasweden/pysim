@@ -14,14 +14,14 @@ string Adder6D::getDocs() {
 }
 
 Adder6D::Adder6D(void) :
-	inputs(MAX_INPUTS, pysim::vector::Zero(6)),
+	_inputs(MAX_INPUTS, pysim::vector::Zero(6)),
 	out(pysim::vector::Zero(6))
 {
 	int i = 0;
-	for (auto iter = inputs.begin(); iter != inputs.end(); ++iter) {
+	for (auto iter = _inputs.begin(); iter != _inputs.end(); ++iter) {
 		pysim::vector* p = &(*iter);
 		std::string name = str(boost::format("input_%1%") % i++);
-		input(p, name.c_str(), "");
+		inputs.add(name.c_str(), p, "");
 	}
 
 	OUTPUT(out, "Result of the addition")
@@ -29,7 +29,7 @@ Adder6D::Adder6D(void) :
 
 void Adder6D::doStep(double time) {
 	out << 0, 0, 0, 0, 0, 0;
-	for (auto iter = inputs.begin(); iter != inputs.end(); ++iter) {
+	for (auto iter = _inputs.begin(); iter != _inputs.end(); ++iter) {
 		out += *iter;
 	}
 }
