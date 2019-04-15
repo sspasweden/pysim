@@ -5,7 +5,7 @@ solved in Simulations
 """
 __copyright__ = 'Copyright (c) 2014-2017 SSPA Sweden AB'
 
-__version__ = "3.0.dev6"
+__version__ = "3.0.dev7"
 
 def test():
     """Runs all the tests for pysim"""
