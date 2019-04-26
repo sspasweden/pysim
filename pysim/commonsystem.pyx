@@ -146,7 +146,7 @@ cdef class CommonSystem:
         self.set_inputs(**kwargs)
         self._initialize()
 
-    cpdef void _initialize(self):
+    cpdef void _initialize(self) except *:
         """Intialize system"""
         self._c_s.__preSim()
 
@@ -155,7 +155,7 @@ cdef class CommonSystem:
         self.set_inputs(**kwargs)
         self._evaluate(time)
 
-    cpdef void _evaluate(self, double time):
+    cpdef void _evaluate(self, double time) except *:
         """Evaluate a single timestep"""
         self._c_s.__preStep()
         self._c_s.__doStep(time)
