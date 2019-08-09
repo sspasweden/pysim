@@ -49,5 +49,12 @@ def test_vectormap_parameter():
     sim.simulate(0.1,0.1)
     assert sys.outputs.output_from_vectormap == 2
 
+def test_get_description_map():
+    """Test that it is possible to get the description map"""
+    sys = get_system()
+    map = sys.pars._getDescriptionMap()
+    assert map == {'parameter_vectormap': 'Parameter Vector Map', 'parameter_matrix': 'Parameter Matrix', 'parameter_vector': 'Parameter vector', 'parameter_map': 'Parameter Map'}
+
+
 if __name__ == "__main__":
-    test_map_parameter()
+    test_get_description_map()

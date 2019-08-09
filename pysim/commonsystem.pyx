@@ -330,6 +330,10 @@ cdef class Parameters:
         else:
             raise AttributeError("No input {} in system".format(name))
 
+    def _getDescriptionMap(self):
+        dutf8 = dictToUtf8(self._c_sys.getParDescriptionMap())
+        return dutf8
+
 cdef class PysimVars:
     """Contains all the variables for the system.
 
