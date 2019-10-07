@@ -203,6 +203,10 @@ void CommonSystemImpl::__preSim()
 
 void CommonSystemImpl::__preStep()
 {
+
+	this->preStep();
+	this->__copyinputs();
+	this->__copyoutputs();
     this->__copystateoutputs();
 
     // Subsystems
@@ -210,8 +214,6 @@ void CommonSystemImpl::__preStep()
         sys->__preStep();
     }
 
-    this->preStep();
-	this->__copyinputs();
 }
 
 void CommonSystemImpl::__doStep(double time)
