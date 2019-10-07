@@ -27,18 +27,16 @@ struct StateType {
 
 struct CommonSystemImplPrivate {
 
-    std::map<std::string, std::string> state_to_der_map_scalars;
-    std::map<std::string, std::string> state_to_der_map_vectors;
-    std::map<std::string, std::string> state_to_der_map_matrices;
-
+    // Par containers
     std::map<std::string, ParString*> par_strings;
     std::map< std::string, ParMap* > par_maps;
     std::map<std::string, ParVectorMap* > par_vector_maps;
     std::map<std::string, ParVector* > par_vectors;
     std::map<std::string, ParMatrix* > par_matrices;
-
-    std::map<std::string, pysim::matrix* > par_boost_matrices;
     std::map<std::string, std::string> par_descriptions;
+
+    std::map<std::string, SimulatableSystemInterface*> subsystems;
+    std::vector<SimulatableSystemInterface*> subsystems_vec;
 
     StoreHandler storeHandler;
 
@@ -51,4 +49,3 @@ struct CommonSystemImplPrivate {
 };
 
 }
-

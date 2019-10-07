@@ -11,12 +11,15 @@ cdef extern from "Variable.hpp" namespace "pysim":
         vector[string] getMatrixNames()
         vector[vector[double]] getMatrix(char* name) except +
         void setMatrix(char*, vector[vector[double]]) except +
+        void addMatrix(string, size_t, size_t, string) except +
         vector[string] getVectorNames()
         vector[double] getVector(char* name) except +
         void setVector(char*, vector[double]) except +
+        void addVector(string, size_t, string) except +
         vector[string] getScalarNames()
         void setScalar(char*, double) except +
         double getScalar(char*) except +
+        void addScalar(string, string) except +
         map[string,string] getDescriptionMap()
 
 cdef extern from "CommonSystemImpl.hpp" namespace "pysim":
@@ -27,6 +30,15 @@ cdef extern from "CommonSystemImpl.hpp" namespace "pysim":
         Variable states
         Variable ders
         ConnectionHandler connectionHandler
+        vector[string] subsystem_names
+
+        void __preSim() except +
+        void __preStep() except +
+        void __doStep(double) except +
+        void __postStep() except +
+
+        void add_subsystem(simulatablesystem.SimulatableSystemInterface* , string) except +
+        simulatablesystem.SimulatableSystemInterface* get_subsystem(string) except +
 
         vector[string] getParNames[T]()
         T getPar[T](char*) except +
@@ -56,6 +68,9 @@ cdef extern from "StoreHandler.hpp" namespace "pysim":
 
 cdef class CommonSystem(simulatablesystem.SimulatableSystem):
     cdef CommonSystemImpl * _c_s
+    cdef dict _subsystems
+    cpdef void _initialize(CommonSystem) except *
+    cpdef void _evaluate(CommonSystem, double) except *
 
 cdef class Parameters:
     cdef CommonSystemImpl* _c_sys

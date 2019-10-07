@@ -11,21 +11,21 @@ string ScalarAdder::getDocs() {
 }
 
 ScalarAdder::ScalarAdder(void) :
-    inputs(MAX_INPUTS,0.0),
+    _inputs(MAX_INPUTS,0.0),
     out(0.0)
 {
     int i = 0;
-    for (auto iter = inputs.begin(); iter != inputs.end(); ++iter) {
+    for (auto iter = _inputs.begin(); iter != _inputs.end(); ++iter) {
         double* p = &(*iter);
         std::string name = str(boost::format("input_%1%") % i++);
-        input(p, name.c_str(), "");
+        inputs.add(name.c_str(), p, "");
     }
-    output(&out, "out", "The sum of all inputs");
+    outputs.add("out", &out, "The sum of all inputs");
 }
 
 void ScalarAdder::doStep(double time) {
     out = 0;
-    for (auto iter = inputs.begin(); iter != inputs.end(); ++iter) {
+    for (auto iter = _inputs.begin(); iter != _inputs.end(); ++iter) {
         out += *iter;
     }
 }

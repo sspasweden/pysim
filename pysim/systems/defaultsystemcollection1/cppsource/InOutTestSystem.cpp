@@ -11,20 +11,20 @@ std::string InOutTestSystem::getDocs(){
 
 InOutTestSystem::InOutTestSystem(void):
     input_scalar(0.0),
-    input_vector(3, 0.0),
-    input_matrix(Eigen::MatrixXd::Zero(3, 3)),
+    input_vector(pysim::vector::Zero(3)),
+    input_matrix(pysim::matrix::Zero(3, 3)),
     input_output_scalar(0.0),
-    input_output_vector(3, 0.0),
-    input_output_matrix(Eigen::MatrixXd::Zero(3, 3)),
+    input_output_vector(pysim::vector::Zero(3)),
+    input_output_matrix(pysim::matrix::Zero(3, 3)),
     state_output_scalar(0.0),
-    state_output_vector(3, 0.0),
-    state_output_matrix(Eigen::MatrixXd::Zero(3, 3)),
+    state_output_vector(pysim::vector::Zero(3)),
+    state_output_matrix(pysim::matrix::Zero(3, 3)),
     state_scalar(1.23),
-    state_vector(3, 4.56),
-    state_matrix(Eigen::MatrixXd::Zero(3, 3)),
+    state_vector(pysim::vector::Constant(3, 4.56)),
+    state_matrix(pysim::matrix::Zero(3, 3)),
     der_scalar(0.0),
-    der_vector(3, 0.0),
-    der_matrix(Eigen::MatrixXd::Zero(3, 3))
+    der_vector(pysim::vector::Zero(3)),
+    der_matrix(pysim::matrix::Zero(3, 3))
 {
     INPUT(input_scalar, "Input Scalar")
     INPUT(input_vector, "Input vector")

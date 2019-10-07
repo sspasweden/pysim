@@ -3,6 +3,7 @@
 #include "factory.hpp"
 
 using std::string;
+using namespace Eigen;
 
 string RigidBody::getDocs(){
     return string(
@@ -11,15 +12,15 @@ string RigidBody::getDocs(){
 }
 
 RigidBody::RigidBody(void) :
-    force(3, 0.0),
-    moment(3, 0.0),
+    force(pysim::vector::Zero(3)),
+    moment(pysim::vector::Zero(3)),
     mass(1.0),
-    inertia(3, 3, 0.0),
-    cog(3,0.0),
-    position(3, 0.0), d_pos(3, 0.0),
-    velocity(3, 0.0), d_velocity(3, 0.0),
-    attitude(3, 0.0), d_att(3, 0.0),
-    rotation_vel(3, 0.0), d_rotation_vel(3, 0.0)
+    inertia(pysim::matrix::Zero(3, 3)),
+    cog(pysim::vector::Zero(3)),
+    position(pysim::vector::Zero(3)), d_pos(pysim::vector::Zero(3)),
+    velocity(pysim::vector::Zero(3)), d_velocity(pysim::vector::Zero(3)),
+    attitude(pysim::vector::Zero(3)), d_att(pysim::vector::Zero(3)),
+    rotation_vel(pysim::vector::Zero(3)), d_rotation_vel(pysim::vector::Zero(3))
 
 {
     INPUT(force, "Force applied to the body, in body coordinates");
@@ -40,48 +41,18 @@ RigidBody::RigidBody(void) :
 void RigidBody::preSim() {
 };
 
-pysim::vector cross_product(const pysim::vector& a, const pysim::vector& b) {
-    pysim::vector out(3);
-    out(0) = a(1)*b(2) - a(2)*b(1);
-    out(1) = a(2)*b(0) - a(0)*b(2);
-    out(2) = a(0)*b(1) - a(1)*b(0);
-    return out;
-}
-
-pysim::matrix rotmat_toglob(double phi, double theta, double psi) {
-    pysim::matrix out(3, 3);
-    out(0, 0) = cos(psi)*cos(theta);
-    out(0, 1) = cos(psi)*sin(theta)*sin(phi) - 1 * sin(psi)*cos(phi);
-    out(0, 2) = sin(psi)*sin(phi) + cos(psi)*cos(phi)*sin(theta);
-    out(1, 0) = sin(psi)*cos(theta);
-    out(1, 1) = cos(psi)*cos(phi) + sin(phi)*sin(theta)*sin(phi);
-    out(1, 2) = sin(theta)*sin(psi)*cos(phi);
-    out(2, 0) = -1 * sin(theta);
-    out(2, 1) = cos(theta)*sin(phi);
-    out(2, 2) = cos(theta)*cos(phi);
-    return out;
-}
-
-pysim::matrix rotmat_toglob(const pysim::vector& omega) {
-    double phi = omega(0);
-    double theta = omega(1);
-    double psi = omega(2);
-    return rotmat_toglob(phi, theta, psi);
-}
-
-pysim::vector RigidBody::to_global(pysim::vector v) {
-    pysim::matrix R = rotmat_toglob(attitude);
-    return prod(R, v);
-}
-
-
-void RigidBody::doStep(double time){
-    pysim::vector euler = cross_product(d_rotation_vel, cog);
-    pysim::vector coriolis = cross_product(rotation_vel, velocity);
-    pysim::vector centrifugal = cross_product(rotation_vel, cross_product(rotation_vel, cog));
-    pysim::vector acc = force/mass;
+void RigidBody::doStep(double time) {
+    using namespace Eigen;
+    RowVector3d euler = d_rotation_vel.head<3>().cross(cog.head<3>());
+    RowVector3d coriolis = rotation_vel.head<3>().cross(velocity.head<3>());
+    RowVector3d centrifugal = rotation_vel.head<3>().cross(rotation_vel.head<3>().cross(cog.head<3>()));
+    RowVector3d acc = force / mass;
     d_velocity = acc;// -euler - coriolis - centrifugal;
-    d_pos = to_global(velocity);
+    Matrix3d m;
+    m = AngleAxisd(attitude(2), Vector3d::UnitZ()),    //Yaw
+        AngleAxisd(attitude(1), Vector3d::UnitY()),    //Pitch
+        AngleAxisd(attitude(0), Vector3d::UnitX());    //Roll
+    d_pos = m * velocity.transpose();
 }
 
 REGISTER_SYSTEM(RigidBody);

@@ -2,10 +2,9 @@
 
 #pragma once
 
-#include <boost/numeric/ublas/matrix.hpp>
-#include <boost/numeric/ublas/vector.hpp>
+#include <Eigen/Dense>
 namespace pysim {
-    typedef boost::numeric::ublas::vector<double> vector;
-    typedef boost::numeric::ublas::matrix<double> matrix;
+    typedef Eigen::RowVectorXd vector;
+    typedef Eigen::MatrixXd matrix;
 };
 

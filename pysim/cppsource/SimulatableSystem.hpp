@@ -8,13 +8,15 @@ class SimulatableSystemInterface
 public:
     virtual ~SimulatableSystemInterface(void){};
 
-    virtual void preSim(){};
-	virtual void preStep() {};
-    virtual void doStep(double time)=0;
-    virtual void postStep(){};
+    virtual void __preSim() = 0;
+    virtual void __preStep() = 0;
+    virtual void __doStep(double time) = 0;
+    virtual void __postStep() = 0;
+
     virtual void doStoreStep(double time) = 0;
-    virtual void copyoutputs() = 0;
-    virtual void copystateoutputs() = 0;
+    virtual void __copyinputs() = 0;
+    virtual void __copyoutputs() = 0;
+    virtual void __copystateoutputs() = 0;
 
     virtual std::vector<double*> getStatePointers() = 0;
     virtual std::vector<double*> getDerPointers() = 0;

@@ -6,12 +6,12 @@ The module also contains a number of solvers that the Sim object can use.
 from libcpp.vector cimport vector
 from libcpp cimport bool
 from commonsystem cimport CommonSystem
-from compositesystem import CompositeSystem
 cimport simulatablesystem
 import json
 import importlib
 import collections
 from simulatablesystem cimport SimulatableSystem
+from cppsystem cimport Sys as CppSys
 
 
 cdef extern from "CppSimulation.hpp" namespace "pysim":
@@ -54,6 +54,14 @@ def _get_system_name(systemdict, system):
         if id(subsys) == id(system):
             return name
     raise ValueError('argument is not a system')
+
+def unravel_systems(system_dict):
+    out = {}
+    for name, sys in system_dict.items():
+        out[name] = sys
+        out.update(unravel_systems((<CommonSystem?>sys)._subsystems))
+
+    return out
 
 cdef class Sim:
     """This class represents an entire simulation. 
@@ -107,21 +115,40 @@ cdef class Sim:
         currentTime = self._c_sim.getCurrentTime()
         return currentTime
 
-    def _save_system(self,system, namedict):
+
+    def simulate(self, double duration, double dt, solver = Runge_Kutta_4() ):
+        """Start or continue a simulation for duration seconds.
+        The default ODE-solver used is the classic fixed steplength
+        Runge Kutta 4 (rk4), but it is also possible to use other solvers by
+        supplying the solver in the argument "solver".
+        For fixed lenght algorithms the default time step is 0.1 seconds.
+        """
+        name  = bytes(solver.name,'utf-8')
+        abs_err = 0
+        rel_err = 0
+        dense = False
+        if isinstance(solver, Cash_Karp) or isinstance(solver,Dormand_Prince_5):
+            abs_err = solver.absolute_error
+            rel_err = solver.relative_error
+        if isinstance(solver,Dormand_Prince_5):
+            dense = solver.dense_output
+
+        self._c_sim.simulate(duration, dt, name,abs_err,rel_err,dense)
+
+    def _save_system(self, CommonSystem system, namedict):
         systemdict = collections.OrderedDict()
 
-        if isinstance(system, CompositeSystem):
-            systemdict["type"] = "CompositeSystem"
-            systemdict["module"] = "pysim.compositesystem"
-            systemdict["ports"] = {"in": system.in_ports, "out": system.out_ports}
+        systemdict["type"] = type(system).__name__
+        systemdict["module"] = type(system).__module__
 
-            subsystems = {}
-            for subname,subsys in system.subsystems.items():
-                subsystems[subname] = self._save_system(subsys, system.subsystems)
-            systemdict["subsystems"] = subsystems
-        else:
-            systemdict["type"] = type(system).__name__
-            systemdict["module"] = type(system).__module__
+        subsystems = {}
+        for subname, subsys in system._subsystems.items():
+            if isinstance(subsys, CppSys) and not (<CppSys>subsys)._owner:
+                continue    # This system is part of a c++ hierarchy and will be recreated anyway by its mother system
+
+            subsystems[subname] = self._save_system(subsys, namedict)
+
+        systemdict["subsystems"] = subsystems
 
         inputdict = collections.OrderedDict()
         for input_name in dir(system.inputs):
@@ -143,9 +170,11 @@ cdef class Sim:
         The path for the file to be stored at is given by the arguement'
         "filepath". This file can later be read with the function "load_config".
         """
+        all_systems = unravel_systems(self.systems)
+
         systems_dict = collections.OrderedDict()
         for name,system in self.systems.items():
-            systems_dict[name] = self._save_system(system, self.systems)
+            systems_dict[name] = self._save_system(system, all_systems)
 
         root_dict = {"systems":systems_dict}
 
@@ -162,39 +191,19 @@ cdef class Sim:
         mod = importlib.import_module(modulename)
         system = getattr(mod,typename)()
 
-        if "ports" in sys_dict.keys():
-            for name, value in sys_dict["ports"]["in"].items():
-                if value["type"] == "scalar":
-                    system.add_port_in_scalar(name, value["value"], value["description"])
-            for name, value in sys_dict["ports"]["out"].items():
-                if value["type"] == "scalar":
-                    system.add_port_out_scalar(name, value["value"], value["description"])
-
         for iname,ivalue in sys_dict["inputs"].items():
             setattr(system.inputs,iname,ivalue)
-        if "subsystems" in sys_dict.keys():
-            for subsysname, subsys_dict in sys_dict["subsystems"].items():
-               subsys = self._setup_system(subsys_dict)
-               system.add_subsystem(subsys, subsysname)
+        for subsysname, subsys_dict in sys_dict["subsystems"].items():
+            subsys = self._setup_system(subsys_dict)
+            system.add_subsystem(subsys, subsysname)
         return system
 
-    def _connect_system(self, system, sys_dict, siblings):
+    def _connect_system(self, system, sys_dict, namedict):
         for con in sys_dict["connections"]:
-            system.connections.add_connection(con[0], siblings[con[1]], con[2])
+            system.connections.add_connection(con[0], namedict[con[1]], con[2])
 
-        if "ports" in sys_dict.keys():
-            for name, portdict in sys_dict["ports"]["in"].items():
-                for con in portdict["connections"]:
-                    subsys = system.subsystems[con["subsystem"]]
-                    system.connect_port_in(name, subsys, con["input"])
-            for name, portdict in sys_dict["ports"]["out"].items():
-                for con in portdict["connections"]:
-                    subsys = system.subsystems[con["subsystem"]]
-                    system.connect_port_out(name, subsys, con["output"])
-
-        if "subsystems" in sys_dict.keys():
-            for subsysname, subsys_dict in sys_dict["subsystems"].items():
-                self._connect_system(system.subsystems[subsysname], subsys_dict, system.subsystems)
+        for subsysname, subsys_dict in sys_dict["subsystems"].items():
+            self._connect_system(getattr(system, subsysname), subsys_dict, namedict)
 
     def load_config(self,filepath):
         """Loads a number of systems and their input values from a file.
@@ -209,25 +218,7 @@ cdef class Sim:
             system = self._setup_system(sys_dict)
             self.add_system(system, name)
 
+        all_systems = unravel_systems(self.systems)
+
         for name,sys_dict in systems_dict.items():
-            self._connect_system(self.systems[name], sys_dict, self.systems)
-
-
-    def simulate(self, double duration, double dt, solver = Runge_Kutta_4() ):
-        """Start or continue a simulation for duration seconds.
-        The default ODE-solver used is the classic fixed steplength
-        Runge Kutta 4 (rk4), but it is also possible to use other solvers by
-        supplying the solver in the argument "solver".
-        For fixed lenght algorithms the default time step is 0.1 seconds.
-        """
-        name  = bytes(solver.name,'utf-8')
-        abs_err = 0
-        rel_err = 0
-        dense = False
-        if isinstance(solver, Cash_Karp) or isinstance(solver,Dormand_Prince_5):
-            abs_err = solver.absolute_error
-            rel_err = solver.relative_error
-        if isinstance(solver,Dormand_Prince_5):
-            dense = solver.dense_output
-
-        self._c_sim.simulate(duration, dt, name,abs_err,rel_err,dense)
+            self._connect_system(self.systems[name], sys_dict, all_systems)

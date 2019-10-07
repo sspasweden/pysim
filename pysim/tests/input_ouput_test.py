@@ -22,11 +22,11 @@ class PythonAdder3D(pysim.cythonsystem.Sys):
     """Class used in testing, equivalent to the c++ Adder3D"""
 
     def __init__(self):
-        self.add_input_vector("input1",3)
-        self.add_input_vector("input2",3)
+        self.inputs.add_vector("input1",3)
+        self.inputs.add_vector("input2",3)
         self.inputs.input1 = [0.0, 0.0, 0.0]
         self.inputs.input2 = [0.0, 0.0, 0.0]
-        self.add_output_vector("output1",3)
+        self.outputs.add_vector("output1",3)
         self.outputs.output1 = [0.0 ,0.0 ,0.0]
 
     def do_step(self,dummy):
@@ -41,11 +41,11 @@ class PythonAdder(pysim.cythonsystem.Sys):
     """Class used in testing, equivalent to the c++ Adder"""
 
     def __init__(self):
-        self.add_input_scalar("input1")
-        self.add_input_scalar("input2")
+        self.inputs.add_scalar("input1")
+        self.inputs.add_scalar("input2")
         self.inputs.input1 = 0.0
         self.inputs.input2 = 0.0
-        self.add_output_scalar("output1")
+        self.outputs.add_scalar("output1")
         self.outputs.output1 = 0.0
 
     def do_step(self,dummy):
@@ -242,6 +242,7 @@ def test_connected_system(test_class1,test_class2):
     assert np.all(sys2.outputs.input_output_matrix == refarray)
 
 
+@pytest.mark.skip()
 @pytest.mark.parametrize("sys1_class,sys2_class",
                          [(InOutTestSystem,InOutTestSystem),
                           (PythonInOutTestSystem,PythonInOutTestSystem),
@@ -341,5 +342,22 @@ def test_der_as_output():
     output_from_output = sys3.res.input_output_scalar
     assert np.allclose(output_from_der, output_from_output)
 
+def test_single_evaluation():
+    """Test a single static evaluation of a system"""
+    input = {"input_vector": [8, 3, 9]}
+    output_expected = {"input_output_vector": [8, 3, 9]}
+
+    sys = InOutTestSystem()
+    sys.initialize(**input)
+    output = sys.get_outputs()
+
+    assert dict(output, **output_expected) != output
+
+    sys.evaluate()
+    output = sys.get_outputs()
+
+    assert dict(output, **output_expected) == output
+
 if __name__ == "__main__":
-    test_input_matrix_change(InOutTestSystem)
+    test_single_evaluation()
+    #test_input_matrix_change(InOutTestSystem)

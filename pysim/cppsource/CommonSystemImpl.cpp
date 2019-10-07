@@ -7,6 +7,7 @@
 #include <iostream>
 #include <string>
 #include <boost/format.hpp>
+#include <boost/range/algorithm_ext.hpp>
 
 using std::string;
 
@@ -14,7 +15,7 @@ namespace pysim {
 
 
 CommonSystemImpl::CommonSystemImpl() :
-    connectionHandler(&outputs, &states, &ders),
+    connectionHandler(&inputs, &outputs, &states, &ders),
     d_ptr(new CommonSystemImplPrivate())
 {
 }
@@ -43,9 +44,7 @@ std::vector<std::string> CommonSystemImpl::getParNames<ParMatrix>() {
     for (auto i = d_ptr->par_matrices.cbegin(); i != d_ptr->par_matrices.cend(); ++i) {
         names.push_back(i->first);
     }
-    for (auto i = d_ptr->par_boost_matrices.cbegin(); i != d_ptr->par_boost_matrices.cend(); ++i) {
-        names.push_back(i->first);
-    }
+
     return names;
 }
 
@@ -124,16 +123,7 @@ ParMatrix CommonSystemImpl::getPar(char* name) {
     std::vector<std::vector<double>> out;
     if (d_ptr->par_matrices.count(name) > 0) {
         out = *d_ptr->par_matrices.at(name);
-    } else if (d_ptr->par_boost_matrices.count(name) > 0) {
-        using  boost::numeric::ublas::matrix;
-        matrix<double>* mat = d_ptr->par_boost_matrices[name];
 
-        size_t columns = mat->size2();
-        for (matrix<double>::const_iterator1 rowiter = mat->begin1(); rowiter != mat->end1(); rowiter++) {
-            std::vector<double> row(columns);
-            std::copy(rowiter.begin(), rowiter.end(), row.begin());
-            out.push_back(row);
-        }
     } else {
         std::string errstr = str(boost::format("Could not find: %1%") % name);
         throw std::invalid_argument(errstr);
@@ -145,29 +135,7 @@ template <>
 void CommonSystemImpl::setPar(char* name, ParMatrix value) {
     if (d_ptr->par_matrices.count(name) > 0) {
         *d_ptr->par_matrices.at(name) = value;
-    } else if (d_ptr->par_boost_matrices.count(name) > 0) {
-        boost::numeric::ublas::matrix<double> *inputm = d_ptr->par_boost_matrices.at(name);
 
-        //Check number of rows
-        if (value.size() != inputm->size1()) {
-            std::string errstr = str(boost::format("Error: %1% shall contain %2% rows") % name % inputm->size1());
-            throw std::invalid_argument(errstr);
-        }
-
-        //Check number of columns (for each row)
-        size_t columns = inputm->size2();
-        for (auto rowiter = value.cbegin(); rowiter != value.cend(); rowiter++) {
-            if (rowiter->size() != columns) {
-                std::string errstr = str(boost::format("Error: %1% shall contain %2% columns") % name % columns);
-                throw std::invalid_argument(errstr);
-            }
-        }
-
-        auto m1iter = inputm->begin1();
-        for (auto rowiter = value.cbegin(); rowiter != value.cend(); rowiter++) {
-            std::copy(rowiter->begin(), rowiter->end(), m1iter.begin());
-            m1iter++;
-        }
     } else {
         char errmsg[50];
         snprintf(errmsg, 50, "Could not find: %s", name);
@@ -218,40 +186,88 @@ std::map<std::string, std::string> CommonSystemImpl::getParDescriptionMap() {
 }
 
 
+/////////////////////////////////////
+//
+//       Subsystem handling
+//
+////////////////////////////////////
+void CommonSystemImpl::__preSim()
+{
+    // Subsystems
+    for (auto const &sys : d_ptr->subsystems_vec) {
+        sys->__preSim();
+    }
+
+    this->preSim();
+}
+
+void CommonSystemImpl::__preStep()
+{
+    this->__copystateoutputs();
+
+    // Subsystems
+    for (auto const &sys : d_ptr->subsystems_vec) {
+        sys->__preStep();
+    }
+
+    this->preStep();
+	this->__copyinputs();
+}
+
+void CommonSystemImpl::__doStep(double time)
+{
+
+    // Subsystems
+    for (auto const &sys : d_ptr->subsystems_vec) {
+        sys->__doStep(time);
+    }
+
+    this->doStep(time);
+    this->__copyoutputs();
+}
+
+void CommonSystemImpl::__postStep()
+{
+    // Subsystems
+    for (auto const &sys : d_ptr->subsystems_vec) {
+        sys->__postStep();
+    }
+
+    this->postStep();
+    this->__copystateoutputs();
+    this->__copyoutputs();
+}
+
+
 ////////////////////////////////////
 //
 //       Connections
 //
 ////////////////////////////////////
 
-void CommonSystemImpl::copyoutputs() {
+void CommonSystemImpl::__copyinputs() {
+    this->copyinputs();
+    connectionHandler.copyinputs();
+}
+
+void CommonSystemImpl::__copyoutputs() {
+    this->copyoutputs();
     connectionHandler.copyoutputs();
 }
 
-void CommonSystemImpl::copystateoutputs() {
+void CommonSystemImpl::__copystateoutputs() {
+    this->copystateoutputs();
     connectionHandler.copystateoutputs();
 }
 
 
 std::vector<double*> CommonSystemImpl::getStatePointers() {
     std::vector<double*> out;
-    for (auto const& p : states.d_ptr->scalars) {
-        out.push_back(p.second);
-    }
+    boost::range::push_back(out, states.getPointers());
 
-    for (auto const&p : states.d_ptr->vectors) {
-        pysim::vector* v = p.second;
-        size_t size = v->size();
-        for (size_t i = 0; i < size; ++i) {
-            out.push_back(&(v->operator()(i)));
-        }
-    }
-
-    for (auto const&p : states.d_ptr->matrices) {
-        for (int i = 0;i<p.second->size();++i){
-            double* d = p.second->data();
-            out.push_back(d++);
-        }
+    // Subsystems
+    for (auto const &sys : d_ptr->subsystems_vec) {
+        boost::range::push_back(out, sys->getStatePointers());
     }
     return out;
 }
@@ -260,38 +276,27 @@ std::vector<double*> CommonSystemImpl::getDerPointers() {
     //In this function we iterate over the state scalars to
     //get the ders in the same order as the states.
     std::vector<double*> out;
-    for (auto const& p : states.d_ptr->scalars) {
-        //push the der that corresponds to the state
-        out.push_back(ders.d_ptr->scalars[d_ptr->state_to_der_map_scalars[p.first]]);
-    }
+    boost::range::push_back(out, ders.getPointers());
 
-    for (auto const&p : states.d_ptr->vectors) {
-        //the der that corresponds to the state
-        pysim::vector* v = ders.d_ptr->vectors[d_ptr->state_to_der_map_vectors[p.first]];
-        size_t size = v->size();
-        for (size_t i = 0; i < size; ++i) {
-            out.push_back(&(v->operator()(i)));
-        }
-    }
-
-    for (auto const&p : states.d_ptr->matrices) {
-        //the der that corresponds to the state
-        Eigen::MatrixXd* m = ders.d_ptr->matrices[d_ptr->state_to_der_map_matrices[p.first]];
-        for (int i = 0; i<m->size(); ++i) {
-            double* d = m->data();
-            out.push_back(d++);
-        }
+    // Subsystems
+    for (auto const &sys : d_ptr->subsystems_vec) {
+        boost::range::push_back(out, sys->getDerPointers());
     }
     return out;
 }
 
 void CommonSystemImpl::doStoreStep(double time) {
     d_ptr->storeHandler.doStoreStep(time);
+
+    // Subsystems
+    for (auto const &sys : d_ptr->subsystems_vec) {
+        sys->doStoreStep(time);
+    }
 }
 
 
 
-//Put the state, der, input or output named "name" in the vector of pointers 
+//Put the state, der, input or output named "name" in the vector of pointers
 //to be stored. If none with "name" is found the function raises an invalid_argument
 //exception.
 void  CommonSystemImpl::store(const char* name) {
@@ -361,7 +366,13 @@ bool CommonSystemImpl::do_comparison() {
         }
     }
 
-    return is_greater || is_smaller;
+    // Subsystems
+    bool subsystem_triggered = false;
+    for (auto const &sys : d_ptr->subsystems_vec) {
+        subsystem_triggered = subsystem_triggered || sys->do_comparison();
+    }
+
+    return is_greater || is_smaller || subsystem_triggered;
 }
 
 double CommonSystemImpl::getNextUpdateTime() {
@@ -374,6 +385,29 @@ bool CommonSystemImpl::getDiscrete(){
 
 StoreHandler* CommonSystemImpl::getStoreHandlerP(){
     return &(d_ptr->storeHandler);
+}
+
+void CommonSystemImpl::add_subsystem(SimulatableSystemInterface * subsystem, string name)
+{
+    if (subsystem->getDiscrete()) {
+        throw std::invalid_argument("Discrete systems not supported as subsystems");
+    }
+    if (d_ptr->subsystems.count(name) > 0) {
+        throw std::invalid_argument("A subsystem with this name already exists!");
+    }
+    subsystem_names.push_back(name);
+    d_ptr->subsystems[name] = subsystem;
+    d_ptr->subsystems_vec.push_back(subsystem);
+}
+
+SimulatableSystemInterface * CommonSystemImpl::get_subsystem(std::string name)
+{
+    if (d_ptr->subsystems.count(name) > 0) {
+        return d_ptr->subsystems[name];
+    }
+    else {
+        throw std::invalid_argument("A subsystem with this name doesn't exist!");
+    }
 }
 
 }

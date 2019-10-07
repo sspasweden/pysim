@@ -15,7 +15,7 @@ public:
     //This function is called for each evaluation
     void doStep(double time);
 
-    //After each set of evaluations when a new state value 
+    //After each set of evaluations when a new state value
     //has been calculated this section is called
     void postStep(){};
 
@@ -26,6 +26,6 @@ protected:
 
     static const int MAX_INPUTS = 10;
 
-    pysim::vector inputs;
+    std::vector<double> _inputs;
     double out;
 };

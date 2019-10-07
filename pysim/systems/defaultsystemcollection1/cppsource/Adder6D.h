@@ -15,7 +15,7 @@ public:
 	//This function is called for each evaluation
 	void doStep(double time);
 
-	//After each set of evaluations when a new state value 
+	//After each set of evaluations when a new state value
 	//has been calculated this section is called
 	void postStep() {};
 
@@ -25,7 +25,7 @@ public:
 protected:
 
 	//Parameters
-	std::vector<pysim::vector> inputs;
+	std::vector<pysim::vector> _inputs;
 
 	//Variables
 	pysim::vector out;

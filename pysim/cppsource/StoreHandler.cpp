@@ -27,7 +27,7 @@ public:
 
 typedef map<string, shared_ptr<StoreStruct<double>>> StoreMap;
 typedef map<string, shared_ptr<StoreStruct<pysim::vector>>> StoreVectorMap;
-typedef map<string, shared_ptr<StoreStruct<Eigen::MatrixXd>>> StoreMatrixMap;
+typedef map<string, shared_ptr<StoreStruct<pysim::matrix>>> StoreMatrixMap;
 
 struct StoreHandlerPrivate {
     StoreMap storemap;
@@ -82,7 +82,7 @@ void StoreHandler::doStoreStep(double time) {
         i->second->storearray.push_back(val);
     }
     for (auto i = d_ptr->storeMatrixMap.cbegin(); i != d_ptr->storeMatrixMap.cend(); ++i) {
-        Eigen::MatrixXd val = *(i->second->valueP);
+        pysim::matrix val = *(i->second->valueP);
         i->second->storearray.push_back(val);
     }
 }
@@ -100,8 +100,8 @@ void  StoreHandler::store(const char* name, pysim::vector* value_p) {
     d_ptr->storeVectorMap[name] = p;
 }
 
-void  StoreHandler::store(const char* name, Eigen::MatrixXd* value_p) {
-    shared_ptr<StoreStruct<Eigen::MatrixXd>> p(new StoreStruct<Eigen::MatrixXd>(value_p));
+void  StoreHandler::store(const char* name, pysim::matrix* value_p) {
+    shared_ptr<StoreStruct<pysim::matrix>> p(new StoreStruct<pysim::matrix>(value_p));
     d_ptr->storeMatrixMap[name] = p;
 }
 
@@ -194,51 +194,17 @@ void StoreHandler::fillWithStore(char* name, double* p, size_t rows, size_t colu
         ptemp += rows*columns;
         auto mat = &(d_ptr->storeVectorMap[name]->storearray);
         int rowcounter = 0;
-        for (auto row = mat->rbegin(); row != mat->rend(); ++row) {
+
+        for (auto ts = mat->rbegin(); ts != mat->rend(); ++ts) {
             if (++rowcounter > rows) {
                 throw std::runtime_error("Internal Pysim Error, invalid number of rows");
             }
-            int columncounter = 0;
-            for (auto i = row->rbegin(); i != row->rend(); ++i) {
-                if (++columncounter > columns) {
-                    throw std::runtime_error("Internal Pysim Error, invalid number of columns");
-                }
-                *(--ptemp) = *i;
+            if (ts->cols() != columns) {
+                throw std::runtime_error("Internal Pysim Error, invalid number of columns");
             }
-        }
-    }
-}
-
-void StoreHandler::fillWithScalars(char* name, double* p, size_t timesteps) {
-    if (d_ptr->storemap.count(name) <= 0) {
-        throw std::invalid_argument("No such stored variable");
-    }
-    double* ptemp = p + timesteps;
-
-    auto v = &(d_ptr->storemap[name]->storearray);
-    if (v->size() != timesteps) {
-        throw std::runtime_error("Internal Pysim Error, invalid number of timesteps");
-    }
-
-    for (auto i = v->rbegin(); i != v->rend(); ++i) {
-        *(--ptemp) = *i;
-    }
-}
-
-void StoreHandler::fillWithVectors(char* name, double* p, size_t timesteps, size_t rows) {
-    double* ptemp = p + timesteps * rows;
-
-    auto v = &(d_ptr->storeVectorMap[name]->storearray);
-    if (v->size() != timesteps) {
-        throw std::runtime_error("Internal Pysim Error, invalid number of timesteps");
-    }
-
-    for (auto ts = v->rbegin(); ts != v->rend(); ++ts) {
-        if (ts->size() != rows) {
-            throw std::runtime_error("Internal Pysim Error, invalid number of columns");
-        }
-        for (auto i = ts->rbegin(); i != ts->rend(); ++i) {
-            *(--ptemp) = *i;
+            for (size_t j = 0; j < columns; j++) {
+                *(--ptemp) = ts->operator()(columns-1-j);
+            }
         }
     }
 }

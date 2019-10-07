@@ -5,9 +5,9 @@
 #include <map>
 #include <string>
 #include <utility>
+#include <memory>
 
 #include "PysimTypes.hpp"
-#include <Eigen/Dense>
 
 namespace pysim {
 
@@ -24,8 +24,6 @@ public:
     //Store handling
     const std::vector<double>& getStoreVector(char* name);
     void fillWithStore(char* name, double* p, size_t rows, size_t columns);
-    void fillWithScalars(char* name, double* p, size_t timesteps);
-    void fillWithVectors(char* name, double* p, size_t timesteps, size_t rows);
     void fillWithMatrices(char* name, double* p, size_t timesteps, size_t rows, size_t columns);
     void fillWithTime(double* p);
     size_t getStoreSize();
@@ -36,7 +34,7 @@ public:
     std::vector<std::string> getStoreMatricesNames();
     void store(const char* name, double* pointer);
     void store(const char* name, pysim::vector* pointer);
-    void store(const char* name, Eigen::MatrixXd* pointer);
+    void store(const char* name, pysim::matrix* pointer);
     bool checkAndStore(const char* name, const Variable& v);
 
 protected:

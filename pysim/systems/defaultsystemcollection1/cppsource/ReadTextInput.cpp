@@ -30,7 +30,7 @@ ReadTextInput::ReadTextInput(void):
     for (size_t i = 1; i <= NUMBER_OF_COLUMNS; i++) {
         char name[100];
         sprintf(name, "column_%lu", i);
-        output(&(columns[i-1]), name, "Output value read from column in file");
+        outputs.add(name, &(columns[i - 1]), "Output value read from column in file");
         columns[i - 1] = 0;
     }
 }
@@ -38,7 +38,7 @@ ReadTextInput::ReadTextInput(void):
 
 //In preparation for the simulation run this function reads the input file
 //and stores the values of it in a map. The file is expected to have
-//the time as first value on each line, followed by the values for each 
+//the time as first value on each line, followed by the values for each
 //column.
 void ReadTextInput::preSim() {
 
@@ -68,8 +68,8 @@ void ReadTextInput::preSim() {
 }
 
 //At each step the values for the current time are store in the member
-//variable "columns". If there is no entry for the current time the 
-//first existing time prior to the current time is used. 
+//variable "columns". If there is no entry for the current time the
+//first existing time prior to the current time is used.
 void ReadTextInput::doStep(double time){
 
     //Get the first time in the map which is larger than the current
@@ -78,7 +78,7 @@ void ReadTextInput::doStep(double time){
     auto i = valuemap.upper_bound(time);
     i--;
 
-    //Iterate over the columns for the selected time and fill in 
+    //Iterate over the columns for the selected time and fill in
     //the member variable.
     std::vector<double> vv = i->second;
     size_t currentColumn = 0;
