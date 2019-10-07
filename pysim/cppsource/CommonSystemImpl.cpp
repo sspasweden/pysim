@@ -211,12 +211,11 @@ void CommonSystemImpl::__preStep()
     }
 
     this->preStep();
-    this->__copyoutputs();
+	this->__copyinputs();
 }
 
 void CommonSystemImpl::__doStep(double time)
 {
-    this->__copyinputs();
 
     // Subsystems
     for (auto const &sys : d_ptr->subsystems_vec) {
