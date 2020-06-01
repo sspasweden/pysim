@@ -329,19 +329,89 @@ void CommonSystemImpl::add_compare_greater(char* comparename, double comparevalu
     }
 }
 
-void CommonSystemImpl::add_compare_smaller(char* comparename, double comparevalue) {
-    using std::make_pair;
+void CommonSystemImpl::add_compare_greater(char* comparename, double comparevalue, unsigned int col) {
+	using std::make_pair;
 
-    if (outputs.d_ptr->scalars.count(comparename) == 1) {
-        auto p = make_pair(outputs.d_ptr->scalars[comparename], comparevalue);
-        d_ptr->compare_smaller_vector.push_back(p);
-    } else if (states.d_ptr->scalars.count(comparename) == 1) {
-        auto p = make_pair(states.d_ptr->scalars[comparename], comparevalue);
-        d_ptr->compare_smaller_vector.push_back(p);
-    } else {
-        std::string errtxt("Could not find state or output to use for comparison");
-        throw std::invalid_argument(errtxt);
-    }
+	if (outputs.d_ptr->vectors.count(comparename) == 1) {
+		auto p = make_pair(&(outputs.d_ptr->vectors[comparename]->coeffRef(col)), comparevalue);
+		d_ptr->compare_greater_vector.push_back(p);
+	}
+	else if (states.d_ptr->vectors.count(comparename) == 1) {
+		auto p = make_pair(&(states.d_ptr->vectors[comparename]->coeffRef(col)), comparevalue);
+		d_ptr->compare_greater_vector.push_back(p);
+	}
+	else {
+		std::string errtxt("Could not find state or output to use for comparison");
+		throw std::invalid_argument(errtxt);
+	}
+}
+
+void CommonSystemImpl::add_compare_greater(char* comparename, double comparevalue, unsigned int row, unsigned int col) {
+	using std::make_pair;
+
+	if (outputs.d_ptr->matrices.count(comparename) == 1) {
+		auto p = make_pair(&(outputs.d_ptr->matrices[comparename]->coeffRef(row, col)), comparevalue);
+		d_ptr->compare_greater_vector.push_back(p);
+	}
+	else if (states.d_ptr->matrices.count(comparename) == 1) {
+		auto p = make_pair(&(states.d_ptr->matrices[comparename]->coeffRef(row)), comparevalue);
+		d_ptr->compare_greater_vector.push_back(p);
+	}
+	else {
+		std::string errtxt("Could not find state or output to use for comparison");
+		throw std::invalid_argument(errtxt);
+	}
+}
+
+void CommonSystemImpl::add_compare_smaller(char* comparename, double comparevalue) {
+	using std::make_pair;
+
+	if (outputs.d_ptr->scalars.count(comparename) == 1) {
+		auto p = make_pair(outputs.d_ptr->scalars[comparename], comparevalue);
+		d_ptr->compare_smaller_vector.push_back(p);
+	}
+	else if (states.d_ptr->scalars.count(comparename) == 1) {
+		auto p = make_pair(states.d_ptr->scalars[comparename], comparevalue);
+		d_ptr->compare_smaller_vector.push_back(p);
+	}
+	else {
+		std::string errtxt("Could not find state or output to use for comparison");
+		throw std::invalid_argument(errtxt);
+	}
+}
+
+void CommonSystemImpl::add_compare_smaller(char* comparename, double comparevalue, unsigned int col) {
+	using std::make_pair;
+
+	if (outputs.d_ptr->vectors.count(comparename) == 1) {
+		auto p = make_pair(&(outputs.d_ptr->vectors[comparename]->coeffRef(col)), comparevalue);
+		d_ptr->compare_smaller_vector.push_back(p);
+	}
+	else if (states.d_ptr->vectors.count(comparename) == 1) {
+		auto p = make_pair(&(states.d_ptr->vectors[comparename]->coeffRef(col)), comparevalue);
+		d_ptr->compare_smaller_vector.push_back(p);
+	}
+	else {
+		std::string errtxt("Could not find state or output to use for comparison");
+		throw std::invalid_argument(errtxt);
+	}
+}
+
+void CommonSystemImpl::add_compare_smaller(char* comparename, double comparevalue, unsigned int row, unsigned int col) {
+	using std::make_pair;
+
+	if (outputs.d_ptr->matrices.count(comparename) == 1) {
+		auto p = make_pair(&(outputs.d_ptr->matrices[comparename]->coeffRef(row, col)), comparevalue);
+		d_ptr->compare_smaller_vector.push_back(p);
+	}
+	else if (states.d_ptr->matrices.count(comparename) == 1) {
+		auto p = make_pair(&(states.d_ptr->matrices[comparename]->coeffRef(row, col)), comparevalue);
+		d_ptr->compare_smaller_vector.push_back(p);
+	}
+	else {
+		std::string errtxt("Could not find state or output to use for comparison");
+		throw std::invalid_argument(errtxt);
+	}
 }
 
 

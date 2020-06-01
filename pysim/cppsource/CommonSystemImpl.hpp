@@ -61,7 +61,11 @@ public:
     SimulatableSystemInterface* get_subsystem(std::string name);
 
     void add_compare_greater(char* comparename, double comparevalue);
+	void add_compare_greater(char* comparename, double comparevalue, unsigned int col);
+	void add_compare_greater(char* comparename, double comparevalue, unsigned int row, unsigned int col);
     void add_compare_smaller(char* comparename, double comparevalue);
+	void add_compare_smaller(char* comparename, double comparevalue, unsigned int col);
+	void add_compare_smaller(char* comparename, double comparevalue, unsigned int row, unsigned int col);
 
     //Parameter handling
     template <typename T> std::vector<std::string> getParNames();

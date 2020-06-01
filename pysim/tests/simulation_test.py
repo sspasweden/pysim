@@ -96,6 +96,21 @@ def test_state_break_larger():
     #If correct the simulation should break at time 0.79
     assert sys.res.time[-1] == 0.79
 
+def test_state_break_larger_vector():
+    """Stop the simulation once the value of a state is 
+    larger than a preset value
+    """
+    sim = Sim()
+    sys = RigidBody()
+    sys.inputs.force = [0, 0, 0.2]
+    sys.add_break_greater("position", 1.0, col=2)
+    sim.add_system(sys)
+    sim.simulate(20,0.01)
+
+    #If correct the simulation should break at time 3.17 and value should be close to 1
+    assert sys.res.time[-1] == 3.17
+    assert sys.states.position[2] == pytest.approx(1.0, rel=0.01)
+
 def test_state_break_smaller():
     """Stop the simulation once the value of a state is 
     larger than a preset value
@@ -108,6 +123,21 @@ def test_state_break_smaller():
 
     #If correct the simulation should break at time 2.52
     assert sys.res.time[-1] == 2.52
+
+def test_state_break_smaller_vector():
+    """Stop the simulation once the value of a state is 
+    larger than a preset value
+    """
+    sim = Sim()
+    sys = RigidBody()
+    sys.inputs.force = [0, 0, -0.2]
+    sys.add_break_smaller("position", -1.0, col=2)
+    sim.add_system(sys)
+    sim.simulate(20,0.01)
+
+    #If correct the simulation should break at time 3.17 and value should be close to -1
+    assert sys.res.time[-1] == 3.17
+    assert sys.states.position[2] == pytest.approx(-1.0, rel=0.01)
 
 def test_boost_vector_states():
     """Perform a basic simulation of a system with boost vector states"""

@@ -111,7 +111,7 @@ cdef class CommonSystem:
         """
         self._c_s.getStoreHandlerP().setStoreInterval(interval)
 
-    def add_break_greater(self,name,value):
+    def add_break_greater(self, name, value, row=None, col=None):
         """Add a break that will be activated if the value of the variable
         or state is larger than the value supplied as argument.
 
@@ -121,25 +121,47 @@ cdef class CommonSystem:
              Name of the variable to watch.
         value: float
              If the variable is below this value then break
+        row: unsigned int
+             row index of value, if an eigen matrice
+        col: unsigned int
+             col index of value, if an eigen matrice
 
         """
         bname = bytes(name,'utf-8')
-        self._c_s.add_compare_greater(bname,value)
+        if row and col:
+            self._c_s.add_compare_greater(bname, value, row, col)
+        elif col:
+            self._c_s.add_compare_greater(bname, value, col)
+        elif row:
+            raise ValueError('Expects either (row & col) or col or neither')
+        else:
+            self._c_s.add_compare_greater(bname,value)
 
-    def add_break_smaller(self,name,value):
+    def add_break_smaller(self, name, value, row=None, col=None):
         """Add a break that will be activated if the value of the variable
         or state is smaller than the value supplied as argument.
 
         Parameters
         ----------
-            name : str
-                Name of the variable to watch
-            value : double
-                If the variable is below this value then break
+        name : str
+            Name of the variable to watch
+        value : double
+            If the variable is below this value then break
+        row: unsigned int
+             row index of value, if an eigen matrice
+        col: unsigned int
+             col index of value, if an eigen matrice
 
         """
         bname = bytes(name,'utf-8')
-        self._c_s.add_compare_smaller(bname,value)
+        if row and col:
+            self._c_s.add_compare_smaller(bname, value, row, col)
+        elif col:				  
+            self._c_s.add_compare_smaller(bname, value, col)
+        elif row:
+            raise ValueError('Expects either (row & col) or col or neither')
+        else:					  
+            self._c_s.add_compare_smaller(bname,value)
 
     def initialize(self, **kwargs):
         """Set pars and inputs from kwargs and then initialize system"""

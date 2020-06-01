@@ -49,7 +49,11 @@ cdef extern from "CommonSystemImpl.hpp" namespace "pysim":
         StoreHandler* getStoreHandlerP()
 
         void add_compare_greater(char* comparename, double comparevalue) except +
+        void add_compare_greater(char* comparename, double comparevalue, unsigned int col) except +
+        void add_compare_greater(char* comparename, double comparevalue, unsigned int row, unsigned int col) except +
         void add_compare_smaller(char* comparename, double comparevalue) except +
+        void add_compare_smaller(char* comparename, double comparevalue, unsigned int col) except +
+        void add_compare_smaller(char* comparename, double comparevalue, unsigned int row, unsigned int col) except +
 
 cdef extern from "StoreHandler.hpp" namespace "pysim":
     cdef cppclass StoreHandler:
